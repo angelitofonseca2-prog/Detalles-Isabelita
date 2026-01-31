@@ -1,0 +1,133 @@
+.oculto {
+  display: none !important;
+}
+
+.badge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: white;
+}
+
+.badge.pendiente {
+  background: #d97706;
+}
+
+.badge.pendiente_validacion {
+  background: #1d4ed8;
+}
+
+.badge.pagado {
+  background: #059669;
+}
+
+.badge.cancelado {
+  background: #dc2626;
+}
+
+.btn-approve,
+.btn-reject {
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-approve {
+  background: #22c55e;
+}
+
+.btn-reject {
+  background: #ef4444;
+}
+
+/* =========================================
+   TABLA PEDIDOS – CABECERA FIJA (ADMIN)
+   ========================================= */
+
+/* Contenedor con scroll */
+.tabla-pedidos-container {
+  max-height: 65vh;
+  /* altura visible del reporte */
+  overflow-y: auto;
+  /* scroll vertical */
+  overflow-x: auto;
+  /* scroll horizontal */
+  border-radius: 8px;
+}
+
+/* Cabecera fija */
+.tabla-pedidos-container thead th {
+  position: sticky;
+  top: 0;
+  background: #be185d;
+  /* pink-700 */
+  z-index: 20;
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+#tablaClientes {
+  table-layout: fixed;
+  width: 100%;
+}
+
+#tablaClientes td {
+  vertical-align: middle;
+}
+
+/* Tabla pedidos admin */
+#tablaPedidos td,
+#tablaPedidos th {
+  text-align: left;
+  vertical-align: middle;
+}
+
+/*COLORES DE FILA SEGÚN ESTADO de pedidos_admin*/
+.btn-action {
+  border: none;
+  padding: 6px 10px;
+  margin: 0 2px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #fff;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.btn-action:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.btn-validar {
+  background-color: #28a745;
+}
+
+.btn-cancelar {
+  background-color: #dc3545;
+}
+
+tr.estado-pagado {
+  background-color: #e6f4ea;
+}
+
+tr.estado-pendiente_validacion {
+  background-color: #fff8e1;
+}
+
+tr.estado-pendiente_pago {
+  background-color: #e3f2fd;
+}
+
+tr.estado-cancelado {
+  background-color: #eeeeee;
+}
+
+/*botones de accion dehabilitadosen en pedidos_admin*/
+.btn-action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}

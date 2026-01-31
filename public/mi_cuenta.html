@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cuenta - Gestión Florería</title>
+    <link rel="stylesheet" href="/css/estilos.css">
+    <link rel="stylesheet" href="/css/output.css">
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+    <main class="max-w-2xl mx-auto p-6 md:p-12">
+        <div class="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
+            <h1 class="text-3xl font-extrabold text-pink-600 mb-2">Mi Cuenta</h1>
+            <p class="text-gray-500 mb-8">Administra tu información de acceso y seguridad.</p>
+
+            <form id="formMiCuenta" class="space-y-6">
+                <!-- Información Básica -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-bold text-gray-700 border-b pb-2">Datos Personales</h2>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Nombre Completo</label>
+                        <input type="text" id="nombre" required
+                            class="w-full border-gray-200 border bg-gray-50 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Correo Electrónico</label>
+                        <input type="email" id="email" required
+                            class="w-full border-gray-200 border bg-gray-50 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all">
+                    </div>
+                </div>
+
+                <!-- Cambio de Contraseña -->
+                <div class="space-y-4 pt-4">
+                    <h2 class="text-lg font-bold text-gray-700 border-b pb-2">Seguridad (Opcional)</h2>
+                    <p class="text-xs text-blue-600 italic">Solo completa estos campos si deseas cambiar tu contraseña
+                        actual.</p>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Nueva Contraseña</label>
+                        <input type="password" id="password" minlength="4"
+                            class="w-full border-gray-200 border bg-gray-50 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all"
+                            placeholder="Dejar vacío para no cambiar">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-gray-600 mb-2">Confirmar Nueva Contraseña</label>
+                        <input type="password" id="confirmPassword"
+                            class="w-full border-gray-200 border bg-gray-50 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-pink-500 transition-all"
+                            placeholder="Repite la nueva contraseña">
+                    </div>
+                </div>
+
+                <div class="pt-6">
+                    <button type="submit"
+                        class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold py-4 px-6 rounded-lg shadow-lg hover:shadow-xl transform active:scale-95 transition-all uppercase tracking-widest text-sm">
+                        Guardar Cambios 💾
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module" src="/js/nav_admin.js"></script>
+    <script src="/js/mi_cuenta.js"></script>
+</body>
+
+</html>

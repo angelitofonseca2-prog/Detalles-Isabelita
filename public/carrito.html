@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito - Florería Detalles Isabelita</title>
+
+    <!-- Tailwind -->
+    <link rel="stylesheet" href="/css/output.css">
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- PayPal SDK se carga dinámicamente en carrito.js -->
+
+
+
+
+</head>
+
+<body class="bg-[#fff7f2] text-gray-900 font-sans">
+
+
+    <main class="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-xl shadow">
+
+        <!-- ============================================================ -->
+        <!-- 🛒 CARRITO DE PRODUCTOS -->
+        <!-- ============================================================ -->
+        <h2 class="text-2xl font-semibold mb-4">Carrito de Compras</h2>
+
+        <table class="table-auto w-full mb-6" id="tablaCarrito">
+            <thead class="bg-[#f4b183] text-white">
+                <tr>
+                    <th class="px-4 py-2">Producto</th>
+                    <th class="px-4 py-2">Precio</th>
+                    <th class="px-4 py-2">Cantidad</th>
+                    <th class="px-4 py-2">Subtotal</th>
+                    <th class="px-4 py-2">Acción</th>
+                </tr>
+            </thead>
+            <tbody id="tbodyCarrito"></tbody>
+        </table>
+
+        <div class="text-right text-xl font-bold mb-8">
+            Total: $<span id="totalCarrito">0.00</span>
+        </div>
+
+        <p id="mensajeDescuento" class="mt-2 text-green-700 font-semibold hidden">
+        </p>
+
+
+        <button id="btnContinuar" class="bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700">
+            Continuar con la compra
+        </button>
+
+        <!-- ============================================================ -->
+        <!-- 👤 DATOS DEL CLIENTE -->
+        <!-- ============================================================ -->
+        <section id="seccionCliente" class="hidden mt-10">
+
+            <h2 class="text-xl font-semibold mb-4">Datos del Cliente</h2>
+
+            <!-- 🔍 BUSCADOR DE CLIENTE (FILTRO) -->
+            <div class="mb-6 p-4 bg-sky-50 border border-sky-200 rounded-lg shadow-sm">
+                <label class="font-bold text-sky-800 flex items-center gap-2 mb-2">
+                    <span>🔍</span> BUSCAR CLIENTE EXISTENTE (Nombre o Cédula)
+                </label>
+                <div class="relative">
+                    <input id="buscadorCliente" type="text"
+                        class="border-sky-300 border-2 px-4 py-2 rounded-lg w-full focus:border-sky-500 focus:ring-2 focus:ring-sky-200 outline-none transition-all"
+                        placeholder="Escriba para filtrar clientes..." autocomplete="off">
+                    <div id="sugerenciasClientes"
+                        class="absolute z-30 w-full bg-white border border-gray-300 rounded-lg shadow-xl hidden max-h-60 overflow-y-auto mt-1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div>
+                    <label class="font-medium">Cédula</label>
+                    <input id="cedula" type="text" class="border px-3 py-2 rounded w-full bg-gray-50"
+                        placeholder="0000000000">
+                </div>
+
+                <div>
+                    <label class="font-medium">Nombre</label>
+                    <input id="nombre" type="text" class="border px-3 py-2 rounded w-full bg-gray-50"
+                        placeholder="Nombre completo">
+                </div>
+
+                <div>
+                    <label class="font-medium">Teléfono</label>
+                    <input id="telefono" type="text" class="border px-3 py-2 rounded w-full">
+                </div>
+
+                <div>
+                    <label class="font-medium">Dirección</label>
+                    <input id="direccion" type="text" class="border px-3 py-2 rounded w-full">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="font-medium">Correo</label>
+                    <input id="correo" type="email" class="border px-3 py-2 rounded w-full">
+                </div>
+
+            </div>
+
+
+            <button id="btnGuardarCliente" class="mt-4 bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700">
+                Guardar Cliente
+            </button>
+
+        </section>
+
+        <!-- ============================================================ -->
+        <!-- 💳 MÉTODOS DE PAGO -->
+        <!-- ============================================================ -->
+        <section id="seccionPago" class="hidden mt-10">
+
+            <h2 class="text-xl font-semibold mb-4">Método de Pago</h2>
+
+            <select id="metodoPago" class="border px-3 py-2 rounded w-full mb-4">
+                <option value="" selected disabled>Selecciona un método</option>
+                <option value="paypal">PayPal</option>
+                <option value="efectivo" class="metodo-admin">Efectivo</option>
+                <option value="transferencia">Transferencia</option>
+            </select>
+
+
+            <!-- PayPal -->
+            <div id="paypal-button-container" class="mt-4"></div>
+
+
+            <!-- Transferencia -->
+            <div id="comprobanteContainer" class="hidden mt-4">
+                <label class="font-medium">Subir comprobante</label>
+                <input id="comprobante" type="file" class="border p-2 rounded w-full">
+            </div>
+
+            <!-- Finalizar (efectivo) -->
+            <button id="btnFinalizar"
+                class="hidden mt-6 bg-green-600 text-white px-6 py-3 rounded-lg shadow hover:bg-green-700">
+                Finalizar Pedido
+            </button>
+
+        </section>
+    </main>
+
+    <!-- ======================================================================================== -->
+    <!-- SCRIPTS -->
+    <!-- ======================================================================================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="/js/nav_public.js"></script>
+    <script src="/js/carrito.js"></script>
+
+</body>
+
+</html>

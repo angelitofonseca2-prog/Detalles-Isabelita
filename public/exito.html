@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pago exitoso</title>
+    <link rel="stylesheet" href="/css/output.css">
+</head>
+
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+
+    <!-- CARD -->
+    <div class="max-w-lg w-full bg-white shadow-xl rounded-2xl p-10 text-center">
+
+        <div class="mb-6">
+            <svg class="mx-auto w-20 h-20 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            </svg>
+        </div>
+
+        <h1 class="text-3xl font-extrabold text-green-600 mb-2">
+            ¡Pago exitoso!
+        </h1>
+
+        <p class="text-gray-700">Tu compra ha sido procesada correctamente.</p>
+
+        <!-- ⭐ AQUÍ SE CARGA LA INFO DEL PEDIDO ⭐ -->
+        <div id="pedidoInfo" class="mt-6 text-left text-gray-800 leading-relaxed"></div>
+
+        <div class="mt-8">
+            <a href="/index.html" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg shadow">
+                Volver al inicio
+            </a>
+        </div>
+    </div>
+
+
+    <!-- ===========================================================
+         SCRIPT PARA LEER LOS DATOS Y MOSTRAR INFO DEL PEDIDO
+    ============================================================ -->
+    <script>
+        (function () {
+
+            const params = new URLSearchParams(window.location.search);
+
+            const id = params.get("id") || params.get("pedido");  // PayPal usa "pedido"
+            const total = params.get("total");
+            const metodo = params.get("metodo") || "paypal";      // PayPal aún no enviaba "metodo"
+            const txn = params.get("txn") || params.get("transaccion");
+
+            const info = document.getElementById("pedidoInfo");
+
+            if (!id || !total || !metodo) {
+                info.innerHTML = `
+                <span class="text-red-600 font-semibold">
+                    No se pudo cargar la información del pedido.
+                </span>`;
+                return;
+            }
+
+            // PAYPAL
+            if (metodo === "paypal") {
+                info.innerHTML = `
+                <strong>ID Pedido:</strong> ${id}<br>
+                <strong>Total Pagado:</strong> $${total}<br>
+                <strong>Método:</strong> PayPal<br>
+                <strong>ID Transacción:</strong> ${txn}
+            `;
+                return;
+            }
+
+            // TRANSFERENCIA
+            if (metodo === "transferencia") {
+                info.innerHTML = `
+                <strong>ID Pedido:</strong> ${id}<br>
+                <strong>Total a Pagar:</strong> $${total}<br>
+                <strong>Método:</strong> Transferencia bancaria<br>
+                <strong>Estado:</strong> Pendiente de validación del comprobante
+            `;
+                return;
+            }
+
+            // EFECTIVO
+            if (metodo === "efectivo") {
+                info.innerHTML = `
+                <strong>ID Pedido:</strong> ${id}<br>
+                <strong>Total Pagado:</strong> $${total}<br>
+                <strong>Método:</strong> Efectivo<br>
+                <strong>Estado:</strong> Pagado
+            `;
+                return;
+            }
+
+            // BACKUP DEFAULT
+            info.innerHTML = `
+            <strong>ID Pedido:</strong> ${id}<br>
+            <strong>Total:</strong> $${total}<br>
+            <strong>Método:</strong> ${metodo}
+        `;
+
+        })();
+    </script>
+
+</body>
+
+</html>

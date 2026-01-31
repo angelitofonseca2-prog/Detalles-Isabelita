@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestión de Pedidos</title>
+
+  <!-- Estilos -->
+  <link rel="stylesheet" href="/css/estilos.css" />
+  <link rel="stylesheet" href="/css/output.css">
+
+  <!-- Flatpickr CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- ============================= -->
+  <!-- 🔳 MODAL DE COMPROBANTE -->
+  <!-- ============================= -->
+  <div id="modalComprobante" class="hidden fixed inset-0 bg-black bg-opacity-90 flex justify-center items-center z-50">
+
+    <img id="imgComprobante" src=""
+      class="max-w-screen-md max-h-screen-md object-contain cursor-zoom-in transition-transform duration-200"
+      alt="Comprobante">
+
+    <button id="btnCerrarModal" class="absolute top-4 right-4 text-white text-3xl font-bold">
+      ✕
+    </button>
+  </div>
+
+  <!-- ============================= -->
+  <!-- 📦 CONTENIDO PRINCIPAL -->
+  <!-- ============================= -->
+  <main class="max-w-7xl mx-auto p-6">
+
+    <h1 class="text-3xl font-extrabold text-pink-600 mb-6">
+      Gestión de Pedidos
+    </h1>
+
+    <!-- 🔎 FILTROS -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+
+      <div>
+        <label class="text-sm font-semibold block">Desde</label>
+        <input type="date" id="fechaDesde" class="border rounded px-3 py-2 w-full" placeholder="Seleccionar fecha...">
+      </div>
+
+      <div>
+        <label class="text-sm font-semibold block">Hasta</label>
+        <input type="date" id="fechaHasta" class="border rounded px-3 py-2 w-full" placeholder="Seleccionar fecha...">
+      </div>
+
+      <div>
+        <label class="text-sm font-semibold block">Estado</label>
+        <select id="filtroEstado" class="border rounded px-3 py-2 w-full">
+          <option value="Todos">Todos</option>
+          <option value="pendiente_pago">Pendiente de pago</option>
+          <option value="pendiente_validacion">Pendiente de validación</option>
+          <option value="pagado">Pagado</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
+      </div>
+
+      <div class="flex items-end">
+        <button id="btnFiltrar" class="bg-pink-600 hover:bg-pink-700 text-white w-full py-2 rounded-lg shadow">
+          Filtrar
+        </button>
+      </div>
+    </div>
+
+    <!-- 🔍 Buscador -->
+    <div class="flex justify-end mb-4">
+      <input id="buscar" type="text" class="border rounded px-3 py-2 w-64" placeholder="Buscar por nombre o cédula...">
+    </div>
+
+    <!-- ⬇️ EXPORTACIÓN -->
+    <div class="flex gap-4 my-4">
+      <button id="btnExportPDF" class="bg-red-500 text-white px-4 py-2 rounded">
+        Exportar PDF
+      </button>
+      <button id="btnExportExcel" class="bg-green-500 text-white px-4 py-2 rounded">
+        Exportar Excel
+      </button>
+    </div>
+
+    <!-- 📋 TABLA -->
+    <div class="bg-white rounded-xl shadow">
+      <div class="tabla-pedidos-container overflow-x-auto">
+        <table class="min-w-full text-sm text-center border-collapse">
+          <thead class="bg-pink-600 text-white">
+            <tr>
+              <th class="px-4 py-2">CLIENTE</th>
+              <th class="px-4 py-2">CÉDULA</th>
+              <th class="px-4 py-2">SUBTOTAL</th>
+              <th class="px-4 py-2">DESCUENTO</th>
+              <th class="px-4 py-2">TOTAL</th>
+              <th class="px-4 py-2">FECHA</th>
+              <th class="px-4 py-2">ESTADO</th>
+              <th class="px-4 py-2">MÉTODO PAGO</th>
+              <th class="px-4 py-2">COMPROBANTE</th>
+              <th class="px-4 py-2">ACCIONES</th>
+            </tr>
+          </thead>
+
+          <tbody id="tablaPedidos">
+            <!-- filas dinámicas -->
+          </tbody>
+        </table>
+      </div>
+      <!-- Paginación -->
+      <div id="paginacionControls" class="p-4 border-t flex justify-center gap-2"></div>
+    </div>
+
+    <!-- 📊 TOTALES -->
+    <div id="totalesReporte" class="mt-4 p-4 bg-gray-100 border rounded shadow text-right text-lg font-semibold">
+      <p>Subtotal general: <span id="subtotalGeneralPantalla">$0.00</span></p>
+      <p>Descuento total: <span id="descuentoGeneralPantalla">$0.00</span></p>
+      <p>Total general: <span id="totalGeneralPantalla">$0.00</span></p>
+    </div>
+
+    <!-- 🔳 MODAL DETALLE PEDIDO -->
+    <div id="modalDetallePedido"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
+      <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+        <!-- Header -->
+        <div class="bg-pink-600 text-white px-6 py-4 flex justify-between items-center">
+          <h2 class="text-xl font-bold">Detalle de Pedido #<span id="detPedidoId"></span></h2>
+          <button id="cerrarModalDetalle"
+            class="text-white text-2xl hover:text-pink-200 transition-colors">&times;</button>
+        </div>
+
+        <!-- Contenido -->
+        <div class="p-6 overflow-y-auto space-y-6">
+          <!-- Cabecera Detalle -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-pink-50 p-4 rounded-lg border border-pink-100">
+            <div>
+              <p class="text-xs text-pink-600 font-bold uppercase tracking-wider">Cliente</p>
+              <p id="detClienteNombre" class="text-gray-800 font-semibold">-</p>
+            </div>
+            <div>
+              <p class="text-xs text-pink-600 font-bold uppercase tracking-wider">Cédula / RUC</p>
+              <p id="detClienteCedula" class="text-gray-800 font-semibold">-</p>
+            </div>
+            <div>
+              <p class="text-xs text-pink-600 font-bold uppercase tracking-wider">Fecha de Compra</p>
+              <p id="detPedidoFecha" class="text-gray-800 font-semibold">-</p>
+            </div>
+            <div>
+              <p class="text-xs text-pink-600 font-bold uppercase tracking-wider">Estado Actual</p>
+              <span id="detPedidoEstado" class="px-2 py-0.5 rounded-full text-xs font-bold uppercase">-</span>
+            </div>
+          </div>
+
+          <!-- Tabla de Productos -->
+          <div>
+            <h3 class="text-lg font-bold text-gray-800 mb-3 flex items-center">
+              <span class="bg-pink-600 w-2 h-6 rounded-full mr-2"></span>
+              Productos Solicitados
+            </h3>
+            <div class="border rounded-lg overflow-hidden">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50 border-b">
+                  <tr>
+                    <th class="px-4 py-3 text-left font-bold text-gray-600">PRODUCTO</th>
+                    <th class="px-4 py-3 text-center font-bold text-gray-600">CANT</th>
+                    <th class="px-4 py-3 text-right font-bold text-gray-600">P.UNIT</th>
+                    <th class="px-4 py-3 text-right font-bold text-gray-600">SUBTOTAL</th>
+                  </tr>
+                </thead>
+                <tbody id="detTablaProductos">
+                  <!-- Detalles dinámicos -->
+                </tbody>
+                <tfoot class="bg-gray-50 border-t font-bold">
+                  <tr>
+                    <td colspan="3" class="px-4 py-2 text-right text-gray-600">Descuento aplicado:</td>
+                    <td id="detDescuento" class="px-4 py-2 text-right text-red-600">-$0.00</td>
+                  </tr>
+                  <tr class="text-lg">
+                    <td colspan="3" class="px-4 py-2 text-right text-gray-800 font-extrabold uppercase">Total a Pagar:
+                    </td>
+                    <td id="detTotal" class="px-4 py-2 text-right text-pink-600 font-extrabold">$0.00</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="p-4 border-t bg-gray-50 flex justify-end">
+          <button id="btnCerrarAceptar"
+            class="bg-pink-600 hover:bg-pink-700 text-white px-6 py-2 rounded-lg font-bold shadow-md transition-all active:scale-95">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ============================= -->
+  <!-- 📚 LIBRERÍAS (ORDEN CORRECTO) -->
+  <!-- ============================= -->
+
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Flatpickr -->
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+
+  <!-- jsPDF + AutoTable -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.5.28/dist/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- Excel (SheetJS) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+  <!-- ============================= -->
+  <!-- 🧠 SCRIPTS DE LA APP -->
+  <!-- ============================= -->
+  <script type="module" src="/js/nav_admin.js"></script>
+  <script src="/js/pedidos_admin.js"></script>
+
+</body>
+
+</html>

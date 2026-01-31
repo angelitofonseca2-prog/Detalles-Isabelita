@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Iniciar Sesión - Florería Detalles Isabelita</title>
+
+    <!-- Tailwind permitido porque ya lo habilitaste en CSP -->
+    <link rel="stylesheet" href="/css/output.css">
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+    <div class="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
+        <h2 class="text-2xl font-bold text-center mb-6 text-green-700">
+            Iniciar Sesión
+        </h2>
+
+        <form id="loginForm" class="space-y-4">
+
+            <div>
+                <label class="block mb-1 font-medium">Correo electrónico</label>
+                <input id="email" type="email"
+                    class="w-full border p-2 rounded focus:outline-none focus:ring focus:ring-green-300" required>
+            </div>
+
+            <div>
+                <label class="block mb-1 font-medium">Contraseña</label>
+                <input id="password" type="password"
+                    class="w-full border p-2 rounded focus:outline-none focus:ring focus:ring-green-300" required>
+            </div>
+
+            <button type="submit"
+                class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold transition">
+                Ingresar
+            </button>
+        </form>
+
+        <p id="msg" class="text-center mt-4 text-red-600 font-semibold"></p>
+    </div>
+
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+
+            try {
+                const res = await fetch("/api/auth/login", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await res.json();
+                //console.log("RESPUESTA LOGIN:", data);
+
+
+                if (!res.ok) {
+                    alert(data.mensaje || "Credenciales incorrectas");
+                    return;
+                }
+
+                // 🔐 Guardar SOLO el token
+                console.log("RESPUESTA LOGIN:", data);
+                localStorage.setItem("token", data.token);
+                localStorage.setItem("rol", data.usuario.rol);
+                localStorage.setItem("nombre", data.usuario.nombre);
+                localStorage.setItem("usuario_id", data.usuario.id);
+
+                // (opcional) console.log para auditoría
+                console.log("TOKEN EN LOGIN:", localStorage.getItem("token"));
+
+                window.location.href = "/pedidos_admin.html";
+
+
+                alert("Inicio de sesión exitoso");
+
+
+            } catch (error) {
+                alert("No se pudo conectar con el servidor");
+                console.error("ERROR LOGIN:", error);
+            }
+        });
+    </script>
+
+</body>
+
+</html>

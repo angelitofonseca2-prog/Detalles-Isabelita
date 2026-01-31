@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clientes | Florería Rosas del Valle</title>
+  <link rel="stylesheet" href="/css/output.css">
+  <!-- <link rel="stylesheet" href="./css/estilos.css"> 
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"> -->
+</head>
+
+
+<body class="bg-rose-50 text-gray-800">
+
+  <!-- Clientes -->
+  <section id="clientes" class="bg-rose-50 py-16 text-center">
+    <h3 class="text-3xl font-semibold mb-4">Administrador Clientes</h3>
+
+    <!-- Formulario de registro eliminado -->
+
+    <div class="mt-10 overflow-x-auto w-full px-6">
+      <table id="tablaClientes" class="w-full border bg-white rounded shadow-sm text-left"
+        style="table-layout: fixed; min-width: 1100px;">
+
+        <thead class="bg-pink-100 text-left">
+          <tr>
+            <th class="px-3 py-2 text-left w-[15%]">Cédula</th>
+            <th class="px-3 py-2 text-left w-[30%]">Nombre</th>
+            <th class="px-3 py-2 text-left w-[20%]">Correo</th>
+            <th class="px-3 py-2 text-left w-[15%]">Teléfono</th>
+            <th class="px-3 py-2 text-left w-[15%]">Dirección</th>
+            <th class="px-3 py-2 text-left w-[5%]">Acciones</th>
+          </tr>
+        </thead>
+
+
+        <tbody id="clientesBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Modal Editar Cliente -->
+  <div id="modalEditarCliente"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 w-96 shadow-lg">
+      <h3 class="text-xl font-semibold mb-4 text-pink-600 text-center">Editar Cliente</h3>
+
+      <form id="formEditarCliente" class="space-y-3">
+
+        <input type="hidden" id="editIdCliente">
+
+        <input id="editCedula" type="text" class="w-full p-2 border rounded" placeholder="Cédula (10 dígitos)"
+          maxlength="10" />
+
+        <input id="editNombre" type="text" class="w-full p-2 border rounded" placeholder="Nombre completo" />
+
+        <input id="editCorreo" type="email" class="w-full p-2 border rounded" placeholder="Correo electrónico" />
+
+        <input id="editTelefono" type="text" class="w-full p-2 border rounded" placeholder="Número de WhatsApp"
+          maxlength="10" />
+
+        <input id="editDireccion" type="text" class="w-full p-2 border rounded" placeholder="Dirección completa" />
+
+
+        <div class="flex justify-between pt-2">
+          <button type="button" id="btnCancelarEditarCliente"
+            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+            Cancelar
+          </button>
+
+          <button type="submit" class="bg-pink-600 hover:bg-pink-700 text-white px-4 py-2 rounded">
+            Guardar Cambios
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+
+  <!-- Footer -->
+  <footer class="bg-pink-600 text-white text-center py-6 mt-10">
+    <p>&copy; 2025 Florería Detalles Isabelita | Todos los derechos reservados</p>
+  </footer>
+
+
+  <!-- jQuery (primero siempre) -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <!-- DataTables CSS -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+  <!-- DataTables JS (después de jQuery) -->
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+  <!-- TU SCRIPT -->
+  <script src="/js/clientes.js"></script>
+
+  <script type="module">
+    import { protegerPaginaAdmin, mostrarInfoAdmin } from "/js/auth.js";
+
+    protegerPaginaAdmin();   // Bloquea si no es admin
+    mostrarInfoAdmin();      // Muestra admin logueado y botón de logout
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script type="module" src="/js/nav_admin.js"></script>
+
+
+</body>
+
+</html>

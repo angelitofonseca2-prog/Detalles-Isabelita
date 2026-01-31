@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Mensajes - Gestión Florería</title>
+    <link rel="stylesheet" href="/css/estilos.css">
+    <link rel="stylesheet" href="/css/output.css">
+</head>
+
+<body class="bg-gray-100 text-gray-800">
+
+    <main class="max-w-7xl mx-auto p-6">
+        <h1 class="text-3xl font-extrabold text-pink-600 mb-6">Mensajes de Contacto</h1>
+
+        <div class="bg-white rounded-xl shadow overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="min-w-full text-sm text-left border-collapse">
+                    <thead class="bg-pink-600 text-white">
+                        <tr>
+                            <th class="px-6 py-4 font-bold uppercase">Fecha</th>
+                            <th class="px-6 py-4 font-bold uppercase">Nombre</th>
+                            <th class="px-6 py-4 font-bold uppercase">Email</th>
+                            <th class="px-6 py-4 font-bold uppercase">Teléfono</th>
+                            <th class="px-6 py-4 font-bold uppercase">Mensaje</th>
+                            <th class="px-6 py-4 font-bold uppercase">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaMensajes" class="divide-y divide-gray-100">
+                        <!-- dinámico -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="module" src="/js/nav_admin.js"></script>
+    <script src="/js/mensajes_admin.js"></script>
+</body>
+
+</html>
