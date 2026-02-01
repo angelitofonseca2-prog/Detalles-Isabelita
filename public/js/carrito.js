@@ -777,6 +777,7 @@ async function crearPedidoAutomatico() {
 
 const metodoPagoSelect = document.getElementById("metodoPago");
 let paypalSdkLoadingPromise = null;
+let avisoPopupMostrado = false;
 
 if (metodoPagoSelect) {
     metodoPagoSelect.addEventListener("change", async function () {
@@ -797,6 +798,17 @@ if (metodoPagoSelect) {
             const paypalContainer = document.getElementById("paypal-button-container");
             paypalContainer.innerHTML = "";
             paypalContainer.style.display = "block";
+
+            if (!avisoPopupMostrado) {
+                Swal.fire({
+                    icon: "info",
+                    title: "Pago con PayPal",
+                    text: "Si se abre una ventana en blanco, habilita pop-ups para este sitio y vuelve a intentar.",
+                    timer: 3500,
+                    showConfirmButton: false
+                });
+                avisoPopupMostrado = true;
+            }
 
             try {
                 await loadPayPalSdk();
@@ -976,24 +988,7 @@ function renderPaypalButton() {
         });
     };
 
-    const popupPermitido = () => {
-        const popup = window.open("", "_blank", "width=1,height=1");
-        if (!popup || popup.closed || typeof popup.closed === "undefined") {
-            return false;
-        }
-        popup.close();
-        return true;
-    };
-
     paypal.Buttons({
-        onClick: function (_data, actions) {
-            if (!popupPermitido()) {
-                mostrarAvisoPopup();
-                return actions.reject();
-            }
-            return actions.resolve();
-        },
-
         createOrder: function (data, actions) {
             return actions.order.create({
                 purchase_units: [{
