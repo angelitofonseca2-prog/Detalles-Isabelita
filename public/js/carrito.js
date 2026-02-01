@@ -968,7 +968,31 @@ function renderPaypalButton() {
         return;
     }
 
+    const mostrarAvisoPopup = () => {
+        Swal.fire({
+            icon: "warning",
+            title: "Permite ventanas emergentes",
+            text: "Para pagar con PayPal debes permitir pop-ups en este sitio y volver a intentarlo.",
+        });
+    };
+
+    const popupPermitido = () => {
+        const popup = window.open("", "_blank", "width=1,height=1");
+        if (!popup || popup.closed || typeof popup.closed === "undefined") {
+            return false;
+        }
+        popup.close();
+        return true;
+    };
+
     paypal.Buttons({
+        onClick: function (_data, actions) {
+            if (!popupPermitido()) {
+                mostrarAvisoPopup();
+                return actions.reject();
+            }
+            return actions.resolve();
+        },
 
         createOrder: function (data, actions) {
             return actions.order.create({
@@ -1021,6 +1045,10 @@ function renderPaypalButton() {
         onError: function (err) {
             // Solo log, NO alertar al usuario
             console.error("PayPal Sandbox error:", err);
+            const msg = String(err || "");
+            if (msg.toLowerCase().includes("popup") || msg.toLowerCase().includes("window")) {
+                mostrarAvisoPopup();
+            }
         }
 
     }).render("#paypal-button-container");
