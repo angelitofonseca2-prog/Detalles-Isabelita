@@ -17,6 +17,8 @@ import cors from "cors";
 const app = express();
 import rateLimit from "express-rate-limit";
 
+// 🚦 Railway/Proxy: confiar en X-Forwarded-For
+app.set("trust proxy", 1);
 //✅ CSP CORRECTA PARA PAYPAL (sandbox + prod)
 import helmet from "helmet";
 
