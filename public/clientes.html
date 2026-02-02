@@ -86,16 +86,16 @@
 
 
   <!-- jQuery (primero siempre) -->
-  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" defer></script>
 
   <!-- DataTables CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
   <!-- DataTables JS (después de jQuery) -->
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js" defer></script>
 
   <!-- TU SCRIPT -->
-  <script src="/js/clientes.js"></script>
+  <script src="/js/clientes.js" defer></script>
 
   <script type="module">
     import { protegerPaginaAdmin, mostrarInfoAdmin } from "/js/auth.js";
@@ -104,7 +104,7 @@
     mostrarInfoAdmin();      // Muestra admin logueado y botón de logout
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
   <script type="module" src="/js/nav_admin.js"></script>
 
 

@@ -98,6 +98,8 @@ function renderCatalogo(productos) {
     card.innerHTML = `
       <img src="${producto.imagen}"
            alt="${producto.nombre}"
+           loading="lazy"
+           decoding="async"
            class="w-full h-48 object-cover rounded-md mb-4">
 
       <h3 class="text-lg font-bold text-pink-700">${producto.nombre}</h3>
