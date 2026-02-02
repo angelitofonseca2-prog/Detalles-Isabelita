@@ -25,6 +25,13 @@ const pool = mysql.createPool({
   queueLimit: 0,
 });
 
+// ⏰ Fijar zona horaria de la sesión (Ecuador UTC-5)
+pool.on("connection", (conn) => {
+  conn.query("SET time_zone = '-05:00'").catch((err) => {
+    console.error("❌ Error configurando zona horaria MySQL:", err);
+  });
+});
+
 // Mensaje de confirmación
 pool
   .getConnection()
