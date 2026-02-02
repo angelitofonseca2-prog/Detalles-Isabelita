@@ -184,15 +184,34 @@ async function cargarPedidos(filtros = {}) {
    Filtros + búsqueda
 ========================= */
 function getFiltrosDesdeUI() {
-  const desde = document.getElementById("fechaDesde")?.value || "";
-  const hasta = document.getElementById("fechaHasta")?.value || "";
-  const estado = document.getElementById("filtroEstado")?.value || "todos";
+  const rawDesde = document.getElementById("fechaDesde")?.value || "";
+  const rawHasta = document.getElementById("fechaHasta")?.value || "";
+  const estadoRaw = document.getElementById("filtroEstado")?.value || "todos";
+
+  const normalizarFecha = (valor) => {
+    if (!valor) return "";
+    // Si viene en formato dd/mm/yyyy lo convertimos a yyyy-mm-dd
+    if (valor.includes("/")) {
+      const partes = valor.split("/");
+      if (partes.length === 3) {
+        const [dd, mm, yyyy] = partes;
+        if (yyyy && mm && dd) {
+          return `${yyyy}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
+        }
+      }
+    }
+    return valor; // yyyy-mm-dd esperado
+  };
+
+  const desde = normalizarFecha(rawDesde);
+  const hasta = normalizarFecha(rawHasta);
+  const estado = estadoRaw.toString().trim().toLowerCase();
 
   // Backend suele esperar desde/hasta/estado como query params
   const filtros = {};
   if (desde) filtros.desde = desde;
   if (hasta) filtros.hasta = hasta;
-  if (estado && estado.toLowerCase() !== "todos") filtros.estado = estado;
+  if (estado && estado !== "todos") filtros.estado = estado;
 
   return filtros;
 }
