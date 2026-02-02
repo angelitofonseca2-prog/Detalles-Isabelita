@@ -9,7 +9,16 @@ const __dirname = path.dirname(__filename);
    🖼️ Utilidad: normalizar URL de imagen
 ===================================================== */
 function buildImageURL(nombreImagen) {
-  if (!nombreImagen) return "/imagenes/no-image.png";
+  const placeholder =
+    "data:image/svg+xml;charset=utf-8," +
+    encodeURIComponent(
+      "<svg xmlns='http://www.w3.org/2000/svg' width='400' height='300' viewBox='0 0 400 300'>" +
+      "<rect width='100%' height='100%' fill='#f3f4f6'/>" +
+      "<text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='#6b7280' font-size='18' font-family='Arial'>Sin imagen</text>" +
+      "</svg>"
+    );
+
+  if (!nombreImagen) return placeholder;
 
   if (
     nombreImagen.startsWith("http://") ||
@@ -18,7 +27,7 @@ function buildImageURL(nombreImagen) {
     return nombreImagen;
   }
 
-  return `/imagenes/${nombreImagen.trim().replace(/^\/+/, "")}`;
+  return placeholder;
 }
 
 /* =====================================================

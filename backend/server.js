@@ -16,6 +16,7 @@ import express from "express";
 import cors from "cors";
 const app = express();
 import rateLimit from "express-rate-limit";
+import compression from "compression";
 
 // 🚦 Railway/Proxy: confiar en X-Forwarded-For
 app.set("trust proxy", 1);
@@ -47,6 +48,9 @@ const generalLimiter = rateLimit({
 // 🟩 NECESARIOS PARA QUE req.body FUNCIONE
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// ⚡ Compresión para acelerar respuestas
+app.use(compression());
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(",").map(origin => origin.trim()).filter(Boolean)
   : [
@@ -94,7 +98,8 @@ app.use(
           "'unsafe-inline'",
           "https://cdn.jsdelivr.net",
           "https://cdnjs.cloudflare.com",
-          "https://cdn.datatables.net"
+          "https://cdn.datatables.net",
+          "https://fonts.googleapis.com"
         ],
 
         imgSrc: [
@@ -133,7 +138,8 @@ app.use(
 
         fontSrc: [
           "'self'",
-          "https://cdnjs.cloudflare.com"
+          "https://cdnjs.cloudflare.com",
+          "https://fonts.gstatic.com"
         ]
       }
     }
@@ -156,16 +162,23 @@ import usuarioRoutes from "./routes/usuarios.js";
 
 
 // --------- ESTÁTICOS ---------
-// 1) Imágenes de productos
-app.use("/imagenes", express.static(path.join(__dirname, "../public/imagenes")));
+const staticOptions = {
+  maxAge: "7d",
+  etag: true,
+  setHeaders: (res, filePath) => {
+    if (filePath.endsWith(".html")) {
+      res.setHeader("Cache-Control", "no-cache");
+    }
+  }
+};
 
-// 2) Frontend /public (css, js, index.html, etc.)
-app.use(express.static(path.join(__dirname, "../public")));
+// 1) Frontend /public (css, js, index.html, etc.)
+app.use(express.static(path.join(__dirname, "../public"), staticOptions));
 
 // 3) Comprobantes
 app.use(
   "/uploads/comprobantes",
-  express.static(path.join(__dirname, "uploads/comprobantes"))
+  express.static(path.join(__dirname, "uploads/comprobantes"), { maxAge: "7d", etag: true })
 );
 
 // 🔒 Rate Limiting para API solamente (excluye imágenes y estáticos)
@@ -204,7 +217,6 @@ app.get("/debug/paths", (_req, res) => {
   res.json({
     __dirname,
     public: path.join(__dirname, "../public"),
-    imagenes: path.join(__dirname, "../public/imagenes"),
     comprobantes: path.join(__dirname, "uploads/comprobantes"),
   });
 });
