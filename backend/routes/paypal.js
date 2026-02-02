@@ -78,6 +78,11 @@ if (!amount) {
         ? "https://api-m.paypal.com"
         : "https://api-m.sandbox.paypal.com";
 
+    const baseUrl =
+      process.env.APP_URL ||
+      req.headers.origin ||
+      `${req.protocol}://${req.get("host")}`;
+
     const order = await axios.post(
       `${API_BASE}/v2/checkout/orders`,
       {
@@ -90,7 +95,12 @@ if (!amount) {
 
             }
           }
-        ]
+        ],
+        application_context: {
+          return_url: `${baseUrl}/paypal_return.html`,
+          cancel_url: `${baseUrl}/carrito.html`,
+          user_action: "PAY_NOW"
+        }
       },
       {
         headers: {

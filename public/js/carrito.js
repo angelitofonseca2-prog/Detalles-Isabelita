@@ -779,6 +779,54 @@ const metodoPagoSelect = document.getElementById("metodoPago");
 let paypalSdkLoadingPromise = null;
 let avisoPopupMostrado = false;
 
+function ensurePayPalRedirectButton() {
+    const container = document.getElementById("paypal-button-container");
+    if (!container) return;
+
+    let btn = document.getElementById("paypal-redirect-btn");
+    if (btn) return;
+
+    btn = document.createElement("button");
+    btn.id = "paypal-redirect-btn";
+    btn.type = "button";
+    btn.className = "mt-3 w-full bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700";
+    btn.textContent = "Abrir PayPal en esta pestaña";
+    btn.addEventListener("click", redirectPayPalInSameTab);
+    container.parentElement?.appendChild(btn);
+}
+
+async function redirectPayPalInSameTab() {
+    const cedula = $("#cedula").val().trim();
+    if (!cedula || !validarCedulaEcuatoriana(cedula)) {
+        Swal.fire("Error", "Debe ingresar una cédula válida antes de pagar.", "error");
+        return;
+    }
+
+    await recalcularTotales();
+
+    localStorage.setItem("checkout_cedula", cedula);
+
+    try {
+        const res = await fetch("/api/paypal/create-order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ amount: totalConDescuento.toFixed(2) })
+        });
+
+        const data = await res.json();
+        const links = data?.links || [];
+        const approve = links.find(l => l.rel === "approve");
+        if (!approve?.href) {
+            throw new Error("No se pudo obtener el enlace de aprobación de PayPal");
+        }
+
+        window.location.href = approve.href;
+    } catch (err) {
+        console.error("Error redirigiendo a PayPal:", err);
+        Swal.fire("Error", "No se pudo abrir PayPal. Intente nuevamente.", "error");
+    }
+}
+
 if (metodoPagoSelect) {
     metodoPagoSelect.addEventListener("change", async function () {
         const metodo = this.value;
@@ -813,6 +861,7 @@ if (metodoPagoSelect) {
             try {
                 await loadPayPalSdk();
                 renderPaypalButton();
+                ensurePayPalRedirectButton();
             } catch (err) {
                 console.error("Error cargando PayPal SDK:", err);
                 Swal.fire("Error", "No se pudo cargar PayPal. Intente más tarde.", "error");
