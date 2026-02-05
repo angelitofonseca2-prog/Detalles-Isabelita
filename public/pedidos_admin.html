@@ -88,7 +88,7 @@
     <!-- 📋 TABLA -->
     <div class="bg-white rounded-xl shadow">
       <div class="tabla-pedidos-container overflow-x-auto">
-        <table class="min-w-full text-sm text-center border-collapse">
+        <table class="admin-table min-w-full text-sm text-center border-collapse">
           <thead class="bg-pink-600 text-white">
             <tr>
               <th class="px-4 py-2">CLIENTE</th>
@@ -123,7 +123,7 @@
     <!-- 🔳 MODAL DETALLE PEDIDO -->
     <div id="modalDetallePedido"
       class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50 p-4">
-      <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="modal-detalle-content bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
         <!-- Header -->
         <div class="bg-pink-600 text-white px-6 py-4 flex justify-between items-center">
           <h2 class="text-xl font-bold">Detalle de Pedido #<span id="detPedidoId"></span></h2>
@@ -132,7 +132,7 @@
         </div>
 
         <!-- Contenido -->
-        <div class="p-6 overflow-y-auto space-y-6">
+        <div class="modal-detalle-body p-6 overflow-y-auto space-y-6">
           <!-- Cabecera Detalle -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-pink-50 p-4 rounded-lg border border-pink-100">
             <div>
@@ -159,7 +159,7 @@
               <span class="bg-pink-600 w-2 h-6 rounded-full mr-2"></span>
               Productos Solicitados
             </h3>
-            <div class="border rounded-lg overflow-hidden">
+            <div class="modal-detalle-table border rounded-lg overflow-hidden">
               <table class="w-full text-sm">
                 <thead class="bg-gray-50 border-b">
                   <tr>

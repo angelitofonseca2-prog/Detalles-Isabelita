@@ -131,3 +131,83 @@ tr.estado-cancelado {
   box-shadow: none;
   transform: none;
 }
+
+/* =========================================
+   BOTÓN FLOTANTE CARRITO (MÓVIL)
+   ========================================= */
+.floating-cart {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 60;
+  background: #db2777;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  display: none;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+.floating-cart:hover {
+  background: #be185d;
+}
+.floating-cart-count {
+  background: #fff;
+  color: #db2777;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+@media (max-width: 768px) {
+  .floating-cart {
+    display: inline-flex;
+  }
+}
+
+/* =========================================
+   MODAL DETALLE PEDIDO (MÓVIL)
+   ========================================= */
+@media (max-width: 640px) {
+  .modal-detalle-content {
+    max-width: 100%;
+    max-height: 95vh;
+    border-radius: 12px;
+  }
+  .modal-detalle-body {
+    padding: 12px;
+  }
+  .modal-detalle-table {
+    overflow-x: auto;
+  }
+  #modalDetallePedido table {
+    min-width: 520px;
+    font-size: 12px;
+  }
+  #modalDetallePedido th,
+  #modalDetallePedido td {
+    padding: 6px 8px;
+  }
+}
+
+/* =========================================
+   TABLAS ADMIN + MODALES (MÓVIL)
+   ========================================= */
+@media (max-width: 640px) {
+  .admin-table {
+    font-size: 12px;
+  }
+  .admin-table th,
+  .admin-table td {
+    padding: 6px 8px;
+  }
+
+  .admin-modal-content {
+    width: 95vw;
+    max-width: 95vw;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
