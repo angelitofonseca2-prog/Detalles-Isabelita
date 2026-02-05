@@ -122,6 +122,7 @@ function abrirModal(u = null) {
         passwordHint.innerText = "Clave temporal para el primer acceso.";
     }
 
+    modal.classList.add("flex");
     modal.classList.remove("hidden");
     setTimeout(() => {
         modalContent.classList.remove("scale-95", "opacity-0");
@@ -138,6 +139,7 @@ function cerrarModal() {
 
     setTimeout(() => {
         modal.classList.add("hidden");
+        modal.classList.remove("flex");
     }, 300);
 }
 

@@ -314,6 +314,7 @@ async function abrirEditarCliente(cedulaVal) {
 
   // Habilitamos o deshabilitamos? El requerimiento dice que se debe poder corregir.
   editCedula.disabled = false;
+  modalEditarCliente.classList.add("flex");
   modalEditarCliente.classList.remove("hidden");
 }
 
@@ -322,6 +323,7 @@ async function abrirEditarCliente(cedulaVal) {
 ===================================================== */
 function cerrarModalEditarCliente() {
   modalEditarCliente.classList.add("hidden");
+  modalEditarCliente.classList.remove("flex");
   editCedula.disabled = false;
 }
 

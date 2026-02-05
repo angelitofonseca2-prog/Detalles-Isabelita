@@ -139,7 +139,7 @@ tr.estado-cancelado {
   position: fixed;
   right: 16px;
   bottom: 16px;
-  z-index: 60;
+  z-index: 90;
   background: #db2777;
   color: #fff;
   padding: 10px 14px;
@@ -164,6 +164,36 @@ tr.estado-cancelado {
 @media (max-width: 768px) {
   .floating-cart {
     display: inline-flex;
+  }
+}
+
+/* =========================================
+   NAV PUBLICO (MÓVIL)
+   ========================================= */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+}
+
+@media (max-width: 768px) {
+  .site-nav {
+    gap: 8px;
+  }
+  .site-nav-menu {
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding-bottom: 6px;
+    gap: 12px;
+    scrollbar-width: thin;
+  }
+  .site-nav-menu li {
+    flex: 0 0 auto;
+  }
+  .site-nav-actions {
+    width: 100%;
+    justify-content: flex-start;
   }
 }
 

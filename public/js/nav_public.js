@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Navbar HTML
     const navbar = `
-    <nav class="bg-pink-600 p-4 text-white shadow-md flex justify-between items-center">
+    <nav class="site-nav bg-pink-600 p-4 text-white shadow-md flex flex-wrap justify-between items-center">
 
         <!-- IZQUIERDA: Logo + Nombre -->
         <div class="flex items-center gap-2 text-lg font-bold">
@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
 
         <!-- CENTRO: Menú -->
-        <ul class="flex gap-6 items-center font-semibold">
+        <ul class="site-nav-menu flex gap-6 items-center font-semibold">
 
             <li><a href="/index.html" class="hover:underline">Inicio</a></li>
             <li><a href="/contacto.html" class="hover:underline">Contacto</a></li>
@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
         </ul>
 
         <!-- DERECHA -->
-        <div class="flex items-center gap-4">
+        <div class="site-nav-actions flex items-center gap-4">
             ${authButton}
         </div>
     </nav>
@@ -80,6 +80,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Insertarlo al inicio del body
     document.body.insertAdjacentHTML("afterbegin", navbar);
+
+    // Botón flotante de carrito para móviles
+    const floatingCart = `
+      <a id="floatingCart" href="/carrito.html" class="floating-cart" aria-label="Ver carrito">
+        🛒 <span id="floatingCartCount" class="floating-cart-count">0</span>
+      </a>
+    `;
+    document.body.insertAdjacentHTML("beforeend", floatingCart);
 
     // Eventos login y logout
     if (document.getElementById("loginBtn")) {
@@ -115,9 +123,10 @@ function actualizarContadorCarrito() {
     let total = carrito.reduce((acum, item) => acum + Number(item.cantidad), 0);
 
     const span = document.getElementById("contadorCarrito");
-    if (span) {
-        span.textContent = total;
-    }
+    if (span) span.textContent = total;
+
+    const floatSpan = document.getElementById("floatingCartCount");
+    if (floatSpan) floatSpan.textContent = total;
 }
 
 // Ejecutar cuando cargue el DOM

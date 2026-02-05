@@ -190,6 +190,7 @@ async function abrirEditarProducto(id) {
     await cargarCategorias("editCategoria");
     editCategoria.value = p.categoria_id;
 
+    modalEditar.classList.add("flex");
     modalEditar.classList.remove("hidden");
   } catch (error) {
     console.error("Error al cargar producto:", error);
@@ -271,11 +272,13 @@ async function confirmarEliminarProducto(id) {
 btnNuevo.addEventListener("click", async () => {
   formNuevo.reset();
   await cargarCategorias("nuevoCategoria");
+  modalNuevo.classList.add("flex");
   modalNuevo.classList.remove("hidden");
 });
 
 cancelarNuevo.addEventListener("click", () => {
   modalNuevo.classList.add("hidden");
+  modalNuevo.classList.remove("flex");
 });
 
 formNuevo.addEventListener("submit", async e => {
@@ -300,6 +303,7 @@ formNuevo.addEventListener("submit", async e => {
 
     Swal.fire("Creado", "Producto creado correctamente", "success");
     modalNuevo.classList.add("hidden");
+    modalNuevo.classList.remove("flex");
     mostrarProductos();
   } catch (error) {
     console.error("Error al crear producto:", error);
@@ -311,6 +315,7 @@ formNuevo.addEventListener("submit", async e => {
 ================================================= */
 function cerrarModalEditar() {
   modalEditar.classList.add("hidden");
+  modalEditar.classList.remove("flex");
   formEditar.reset();
 }
 

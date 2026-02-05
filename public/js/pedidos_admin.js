@@ -646,9 +646,15 @@ function initModalComprobante() {
   });
 
   // Cerrar modal
-  btnCerrar.addEventListener("click", () => modal.classList.add("hidden"));
+  btnCerrar.addEventListener("click", () => {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  });
   modal.addEventListener("click", (e) => {
-    if (e.target.id === "modalComprobante") modal.classList.add("hidden");
+    if (e.target.id === "modalComprobante") {
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+    }
   });
 
   // Exponer función por si luego quieres usar "verComprobante(url)"
@@ -656,6 +662,7 @@ function initModalComprobante() {
     img.src = url;
     scale = 1;
     img.style.transform = "scale(1)";
+    modal.classList.add("flex");
     modal.classList.remove("hidden");
   };
 }
@@ -670,7 +677,10 @@ function initModalDetalle() {
 
   if (!modal) return;
 
-  const cerrar = () => modal.classList.add("hidden");
+  const cerrar = () => {
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+  };
   btnCerrar?.addEventListener("click", cerrar);
   btnAceptar?.addEventListener("click", cerrar);
   modal.addEventListener("click", (e) => {
@@ -715,6 +725,7 @@ function initModalDetalle() {
       document.getElementById("detDescuento").textContent = `-$${toNumber(pedido.descuento).toFixed(2)}`;
       document.getElementById("detTotal").textContent = `$${toNumber(pedido.total).toFixed(2)}`;
 
+      modal.classList.add("flex");
       modal.classList.remove("hidden");
     } catch (e) {
       console.error(e);
