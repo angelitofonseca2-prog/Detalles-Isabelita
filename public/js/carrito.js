@@ -61,6 +61,24 @@ function eliminarDelCarrito(id) {
 }
 
 /* ======================================================
+  CONFIRMAR ELIMINACIÓN DEL CARRITO
+====================================================== */
+async function confirmarEliminarDelCarrito(id) {
+    const item = carrito.find(p => p.id === id);
+    const { isConfirmed } = await Swal.fire({
+        title: `¿Eliminar ${item?.nombre ?? "este producto"}?`,
+        text: "Esta acción no se puede deshacer.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar"
+    });
+
+    if (!isConfirmed) return;
+    eliminarDelCarrito(id);
+}
+
+/* ======================================================
    AUMENTAR CANTIDAD
 ====================================================== */
 function aumentarCantidad(id) {
@@ -100,7 +118,8 @@ async function recalcularTotales() {
     // 1) Calcular subtotal bruto
     let total = 0;
     carrito.forEach(item => {
-        item.subtotal = item.cantidad * item.precio;
+        const precio = Number(item.precio_unitario ?? item.precio);
+        item.subtotal = item.cantidad * precio;
         total += item.subtotal;
     });
 
@@ -291,7 +310,14 @@ function renderCarrito() {
                 −
             </button>
 
-            <span class="mx-2 font-semibold">${item.cantidad}</span>
+            <input
+                type="number"
+                min="1"
+                step="1"
+                class="input-cantidad mx-2 w-16 text-center border rounded px-2 py-1"
+                value="${item.cantidad}"
+                data-id="${item.id}"
+            />
 
             <button 
                 class="btn-cantidad btn-mas px-2 bg-gray-300 rounded"
@@ -301,7 +327,9 @@ function renderCarrito() {
         </td>
 
         <td class="p-2 border">
-            $${(item.cantidad * Number(item.precio_unitario ?? item.precio)).toFixed(2)}
+            <span class="subtotal-carrito" data-id="${item.id}">
+                $${(item.cantidad * Number(item.precio_unitario ?? item.precio)).toFixed(2)}
+            </span>
         </td>
 
         <td class="p-2 border text-center">
@@ -318,6 +346,63 @@ function renderCarrito() {
     });
 
     recalcularTotales();
+    actualizarEstadoContinuarCompra();
+}
+
+/* ======================================================
+  HABILITAR/DESHABILITAR CONTINUAR COMPRA
+====================================================== */
+function actualizarEstadoContinuarCompra() {
+    const btn = document.getElementById("btnContinuar");
+    if (!btn) return;
+
+    const sinProductos = carrito.length === 0;
+    btn.disabled = sinProductos;
+    btn.setAttribute("aria-disabled", sinProductos ? "true" : "false");
+    btn.classList.toggle("opacity-50", sinProductos);
+    btn.classList.toggle("cursor-not-allowed", sinProductos);
+
+    const seccionCliente = document.getElementById("seccionCliente");
+    const seccionPago = document.getElementById("seccionPago");
+    if (sinProductos) {
+        seccionCliente?.classList.add("hidden");
+        seccionPago?.classList.add("hidden");
+    }
+
+    const mensajeVacio = document.getElementById("mensajeCarritoVacio");
+    mensajeVacio?.classList.toggle("hidden", !sinProductos);
+}
+
+/* ======================================================
+  ACTUALIZAR CANTIDAD MANUALMENTE
+====================================================== */
+function actualizarCantidadManual(id, valor, { forzar = false } = {}) {
+    const item = carrito.find(p => p.id === id);
+    if (!item) return;
+
+    if (valor === "" || valor === null || valor === undefined) {
+        if (!forzar) return;
+    }
+
+    let cantidad = parseInt(valor, 10);
+    if (Number.isNaN(cantidad) || cantidad < 1) {
+        cantidad = 1;
+    }
+
+    item.cantidad = cantidad;
+    item.subtotal = item.cantidad * Number(item.precio_unitario ?? item.precio);
+
+    guardarCarrito();
+    actualizarFilaCarrito(id, item.cantidad, item.subtotal);
+    recalcularTotales();
+}
+
+function actualizarFilaCarrito(id, cantidad, subtotal) {
+    const input = document.querySelector(`.input-cantidad[data-id="${id}"]`);
+    if (input) input.value = cantidad;
+
+    const subtotalEl = document.querySelector(`.subtotal-carrito[data-id="${id}"]`);
+    if (subtotalEl) subtotalEl.innerText = `$${Number(subtotal).toFixed(2)}`;
 }
 
 
@@ -603,6 +688,16 @@ document.getElementById("btnGuardarCliente").addEventListener("click", async () 
    MOSTRAR MÉTODO DE PAGO (AVANZAR)
 ====================================================== */
 document.getElementById("btnContinuar").addEventListener("click", async () => {
+    if (carrito.length === 0) {
+        Swal.fire({
+            icon: "info",
+            title: "Carrito vacío",
+            text: "Agrega productos para continuar con la compra.",
+            confirmButtonText: "Entendido"
+        });
+        return;
+    }
+
     // 🔴 LITERAL C — VALIDAR STOCK ANTES DE CONTINUAR
     const stockOk = await validarStockAntesDeContinuar();
     if (!stockOk) {
@@ -1118,7 +1213,21 @@ document.addEventListener("click", (e) => {
     // 🗑 Eliminar producto
     if (e.target.classList.contains("btn-eliminar")) {
         const id = parseInt(e.target.dataset.id);
-        eliminarDelCarrito(id);
+        confirmarEliminarDelCarrito(id);
     }
 
 });
+
+document.addEventListener("change", (e) => {
+    if (e.target.classList.contains("input-cantidad")) {
+        const id = parseInt(e.target.dataset.id);
+        actualizarCantidadManual(id, e.target.value, { forzar: true });
+    }
+});
+
+document.addEventListener("blur", (e) => {
+    if (e.target.classList.contains("input-cantidad")) {
+        const id = parseInt(e.target.dataset.id);
+        actualizarCantidadManual(id, e.target.value, { forzar: true });
+    }
+}, true);
