@@ -200,8 +200,8 @@ export const crearPedido = async (req, res) => {
     const [pedidoResult] = await conn.query(
       `
       INSERT INTO pedidos
-      (cedula_cliente, total, estado, metodo_pago, descuento, fecha_pago)
-      VALUES (?, ?, ?, ?, ?, ${metodo_pago === "efectivo" ? "NOW()" : "NULL"})
+      (cedula_cliente, total, estado, metodo_pago, descuento, fecha, fecha_pago)
+      VALUES (?, ?, ?, ?, ?, NOW(), ${metodo_pago === "efectivo" ? "NOW()" : "NULL"})
       `,
       [cedula_cliente, totalFinal, estado, metodo_pago, descuentoAplicado]
     );
@@ -328,11 +328,12 @@ export const crearPedidoPaypal = async (req, res) => {
         total,
         estado,
         metodo_pago,
+        fecha,
         fecha_pago,
         paypal_transaction_id,
         descuento
       )
-      VALUES (?, ?, 'pagado', 'paypal', NOW(), ?, ?)
+      VALUES (?, ?, 'pagado', 'paypal', NOW(), NOW(), ?, ?)
       `,
       [cedula_cliente, totalFinal, paypal_transaction_id, mejorDescuento.valor]
     );
