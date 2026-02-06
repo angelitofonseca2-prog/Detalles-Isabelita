@@ -2,21 +2,35 @@
    BASE MÓVIL – Evitar distorsión
    ========================================= */
 html {
-  overflow-x: hidden;
+  overflow-x: clip; /* evita scroll horizontal (más estricto que hidden) */
   -webkit-text-size-adjust: 100%;
+  width: 100%;
+  max-width: 100vw;
 }
 body {
-  overflow-x: hidden;
+  overflow-x: clip;
   min-width: 0;
+  width: 100%;
+  max-width: 100vw;
+  position: relative;
 }
 img {
   max-width: 100%;
   height: auto;
 }
+/* Logo del navbar: tamaño fijo normal (no usar height:auto global) */
+.site-nav img,
+.site-nav-logo {
+  height: 48px !important;
+  width: auto !important;
+  max-width: 140px !important;
+  object-fit: contain;
+}
 /* Evitar overflow en contenedores */
 * {
   box-sizing: border-box;
 }
+
 
 .oculto {
   display: none !important;
@@ -188,12 +202,16 @@ tr.estado-cancelado {
 }
 
 /* =========================================
-   NAV PUBLICO (MÓVIL)
+   NAV PUBLICO + ADMIN (MÓVIL / TABLET)
    ========================================= */
 .site-nav {
   position: sticky;
   top: 0;
   z-index: 80;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  min-width: 0;
 }
 
 .site-nav-burger {
@@ -205,48 +223,73 @@ tr.estado-cancelado {
   border-radius: 8px;
   cursor: pointer;
   font-size: 1.25rem;
+  flex-shrink: 0;
 }
 .site-nav-burger:hover {
   background: rgba(255,255,255,0.2);
 }
 
-@media (max-width: 768px) {
+/* MÓVIL Y TABLET: menú hamburguesa, ocultar enlaces por defecto */
+@media (max-width: 1024px) {
   .site-nav {
     flex-direction: row;
     flex-wrap: wrap;
     gap: 12px;
+    padding: 12px 16px;
   }
   .site-nav-burger {
-    display: inline-flex;
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
   }
   .site-nav-wrap {
-    width: 100%;
+    width: 100% !important;
     order: 3;
-    display: none;
-  }
-  .site-nav-wrap.open {
-    display: flex;
+    display: none !important;
     flex-direction: column;
     gap: 12px;
+    overflow: hidden;
+    min-width: 0;
+  }
+  .site-nav-wrap.open {
+    display: flex !important;
   }
   .site-nav-menu {
     flex-direction: column;
     width: 100%;
     gap: 8px;
     padding-top: 8px;
+    flex-wrap: nowrap;
+    min-width: 0;
   }
   .site-nav-menu li {
     flex: none;
+    width: 100%;
+  }
+  .site-nav-menu a {
+    display: block;
+    padding: 8px 0;
   }
   .site-nav-actions {
     width: 100%;
     justify-content: flex-start;
+    flex-wrap: wrap;
   }
 }
 
-@media (min-width: 769px) {
+/* Fallback JS: si body tiene nav-mobile, forzar menú hamburguesa */
+body.nav-mobile .site-nav-wrap {
+  display: none !important;
+}
+body.nav-mobile .site-nav-wrap.open {
+  display: flex !important;
+}
+body.nav-mobile .site-nav-burger {
+  display: inline-flex !important;
+}
+
+/* ESCRITORIO: menú horizontal, ocultar hamburguesa */
+@media (min-width: 1025px) {
   .site-nav-burger {
     display: none !important;
   }
@@ -278,6 +321,39 @@ tr.estado-cancelado {
   #modalDetallePedido th,
   #modalDetallePedido td {
     padding: 6px 8px;
+  }
+}
+
+/* =========================================
+   DATATABLES MÓVIL (clientes, etc.)
+   ========================================= */
+.dataTables_wrapper {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+  margin-bottom: 0.75rem;
+}
+.dataTables_wrapper .row:first-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+@media (max-width: 640px) {
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter {
+    width: 100%;
+  }
+  .dataTables_wrapper .dataTables_filter input {
+    width: 100%;
+    max-width: 100%;
+  }
+  .dataTables_wrapper .dataTables_paginate {
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 }
 

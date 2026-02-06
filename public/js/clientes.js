@@ -86,9 +86,10 @@ async function cargarClientes() {
   if (!dataTableClientes) {
     dataTableClientes = $("#tablaClientes").DataTable({
       pageLength: 5,
+      lengthChange: false,
       order: [[1, "asc"]],
       autoWidth: false,
-      scrollX: true, // ✅ tabla más ancha
+      scrollX: true,
 
       columnDefs: [
         {
@@ -132,11 +133,14 @@ async function cargarClientes() {
 
       language: {
         search: "Buscar:",
-        lengthMenu: "Mostrar _MENU_ registros",
+        searchPlaceholder: "Buscar por cédula o nombre",
         paginate: {
           next: "Siguiente",
           previous: "Anterior"
         }
+      },
+      initComplete: function () {
+        $("#tablaClientes_filter input").attr("placeholder", "Buscar por cédula o nombre");
       }
     });
   }

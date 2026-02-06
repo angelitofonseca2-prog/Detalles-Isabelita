@@ -7,6 +7,12 @@ import { verificarAdmin } from "./authGuard.js";
 let usuario = null; // ✅ declarar en scope global
 
 document.addEventListener("DOMContentLoaded", async () => {
+  // Detectar móvil/tablet y marcar body para forzar menú hamburguesa
+  const esMovil = () => window.innerWidth <= 1024;
+  if (esMovil()) document.body.classList.add("nav-mobile");
+  window.addEventListener("resize", () => {
+    document.body.classList.toggle("nav-mobile", esMovil());
+  });
 
   // 🔐 Verificar sesión ADMIN (UNA SOLA VEZ)
   usuario = await verificarAdmin();
@@ -19,13 +25,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Construimos el menú SOLO si es admin válido
   const navbar = `
-    <nav class="site-nav bg-pink-600 p-4 text-white shadow-md flex flex-wrap justify-between items-center gap-2">
+    <nav class="site-nav bg-pink-600 p-4 text-white shadow-md flex flex-wrap justify-between items-center gap-2 w-full max-w-full overflow-x-hidden">
 
       <!-- IZQUIERDA: Hamburguesa (móvil) + Logo -->
       <div class="flex items-center gap-3">
           <button type="button" class="site-nav-burger" aria-label="Abrir menú">☰</button>
           <a href="/index.html" class="flex items-center shrink-0">
-              <img src="/resources/logo.png" alt="Isabel, Detalles Eternos" class="h-10 sm:h-12 w-auto max-h-12 object-contain">
+              <img src="/resources/logo.png" alt="Isabel, Detalles Eternos" class="site-nav-logo">
           </a>
       </div>
 
@@ -66,6 +72,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const navWrap = document.querySelector(".site-nav-wrap");
   if (burgerBtn && navWrap) {
     burgerBtn.addEventListener("click", () => navWrap.classList.toggle("open"));
+    // En móvil: ocultar menú al cargar (por si CSS falla)
+    if (esMovil()) navWrap.classList.remove("open");
   }
 
   // Botón cerrar sesión
