@@ -40,7 +40,7 @@ const filtroPrecioMin = document.getElementById("filtroPrecioMin");
 const filtroPrecioMax = document.getElementById("filtroPrecioMax");
 const btnLimpiarFiltros = document.getElementById("btnLimpiarFiltros");
 
-let productosGlobal = []; // Para almacenar todos los productos y filtrar sin recargar
+let productosGlobal = [];
 
 // Modal nuevo
 const btnNuevo = document.getElementById("btnNuevo");
@@ -91,8 +91,8 @@ async function mostrarProductos() {
     const res = await fetch(API_URL);
     const productos = await res.json();
 
-    productosGlobal = productos || []; // Guardar en variable global
-    renderizarProductos(productosGlobal); // Renderizar inicial
+    productosGlobal = productos || [];
+    renderizarProductos(productosGlobal);
   } catch (error) {
     console.error("Error al mostrar productos:", error);
   }

@@ -30,23 +30,28 @@ function configurarEventosDOM() {
         tbody.addEventListener("click", e => {
             const btnEditar = e.target.closest(".btn-editar");
             const btnEliminar = e.target.closest(".btn-eliminar");
-
             if (btnEditar) {
-                const u = JSON.parse(btnEditar.dataset.usuario);
-                abrirModal(u);
+                try {
+                    const u = JSON.parse(btnEditar.dataset.usuario || "{}");
+                    abrirModal(u);
+                } catch (err) { console.error(err); }
             }
-
             if (btnEliminar) {
-                const id = btnEliminar.dataset.id;
-                confirmarEliminar(id);
+                confirmarEliminar(btnEliminar.dataset.id);
             }
         });
     }
 }
 
+let usuariosGlobal = [];
+let paginaActual = 1;
+const registrosPorPagina = 10;
+
 async function cargarUsuarios() {
     const tbody = document.getElementById("listaUsuarios");
     if (!tbody) return;
+
+    tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500">Cargando usuarios...</td></tr>`;
 
     try {
         const token = localStorage.getItem("token");
@@ -57,47 +62,100 @@ async function cargarUsuarios() {
         if (!res.ok) throw new Error("Acceso denegado");
 
         const usuarios = await res.json();
-        tbody.innerHTML = "";
-
-        usuarios.forEach(u => {
-            const tr = document.createElement("tr");
-            tr.className = "hover:bg-gray-50 transition-colors border-b border-gray-100";
-
-            const estadoBadge = u.activo === 1
-                ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold uppercase">Activo</span>'
-                : '<span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold uppercase">Inactivo</span>';
-
-            const rolEmoji = u.rol === "admin" ? "🛡️" : "👤";
-
-            tr.innerHTML = `
-                <td class="px-6 py-4">
-                    <div class="flex flex-col">
-                        <span class="font-bold text-gray-900">${u.nombre}</span>
-                        <span class="text-xs text-gray-400 italic">${u.email}</span>
-                    </div>
-                </td>
-                <td class="px-6 py-4 uppercase font-bold text-xs">
-                    <span class="bg-gray-100 px-2 py-1 rounded text-gray-600">${rolEmoji} ${u.rol}</span>
-                </td>
-                <td class="px-6 py-4">${estadoBadge}</td>
-                <td class="px-6 py-4 text-gray-400 text-xs">${new Date(u.creado_en).toLocaleDateString()}</td>
-                <td class="px-6 py-4 text-right">
-                    <div class="flex justify-end gap-2">
-                        <button class="btn-editar text-blue-600 hover:text-blue-900 p-2" data-usuario='${JSON.stringify(u)}'>
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-eliminar text-red-600 hover:text-red-900 p-2" data-id="${u.id}">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
+        usuariosGlobal = Array.isArray(usuarios) ? usuarios : [];
+        paginaActual = 1;
+        renderUsuarios(usuariosGlobal);
     } catch (error) {
         console.error("Error cargando usuarios:", error);
         tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-red-500 font-bold">Error al conectar con la base de datos.</td></tr>`;
     }
+}
+
+function renderUsuarios(lista) {
+    const tbody = document.getElementById("listaUsuarios");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+
+    if (!lista || lista.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-gray-500">No hay usuarios.</td></tr>`;
+        renderPaginacionUsuarios(0);
+        return;
+    }
+
+    const inicio = (paginaActual - 1) * registrosPorPagina;
+    const fin = inicio + registrosPorPagina;
+    const itemsPagina = lista.slice(inicio, fin);
+
+    itemsPagina.forEach(u => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-gray-50 transition-colors border-b border-gray-100";
+
+        const estadoBadge = u.activo === 1
+            ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-bold uppercase">Activo</span>'
+            : '<span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-bold uppercase">Inactivo</span>';
+
+        const rolEmoji = u.rol === "admin" ? "🛡️" : "👤";
+        const usuarioJson = JSON.stringify(u).replace(/'/g, "&#39;");
+
+        tr.innerHTML = `
+            <td class="px-4 py-3">
+                <div class="flex flex-col">
+                    <span class="font-bold text-gray-900">${u.nombre}</span>
+                    <span class="text-xs text-gray-400 italic">${u.email}</span>
+                </div>
+            </td>
+            <td class="px-4 py-3 uppercase font-bold text-xs">
+                <span class="bg-gray-100 px-2 py-1 rounded text-gray-600">${rolEmoji} ${u.rol}</span>
+            </td>
+            <td class="px-4 py-3">${estadoBadge}</td>
+            <td class="px-4 py-3 text-gray-400 text-xs">${new Date(u.creado_en).toLocaleDateString()}</td>
+            <td class="px-4 py-3 text-right">
+                <div class="flex justify-end gap-2">
+                    <button class="btn-accion-editar btn-editar" data-usuario='${usuarioJson}' title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-accion-eliminar btn-eliminar" data-id="${u.id}" title="Eliminar">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    renderPaginacionUsuarios(lista.length);
+}
+
+function renderPaginacionUsuarios(totalItems) {
+    const container = document.getElementById("paginacionUsuarios");
+    if (!container) return;
+    container.innerHTML = "";
+    container.className = "paginacion-flechas";
+
+    const totalPaginas = Math.ceil(totalItems / registrosPorPagina);
+    if (totalPaginas <= 1) return;
+
+    const inicio = (paginaActual - 1) * registrosPorPagina + 1;
+    const fin = Math.min(paginaActual * registrosPorPagina, totalItems);
+
+    const creaBtn = (icono, disabled, fn) => {
+        const btn = document.createElement("button");
+        btn.innerHTML = `<i class="fas fa-${icono}"></i>`;
+        btn.disabled = disabled;
+        btn.onclick = fn;
+        return btn;
+    };
+
+    container.appendChild(creaBtn("angle-double-left", paginaActual === 1, () => { paginaActual = 1; renderUsuarios(usuariosGlobal); }));
+    container.appendChild(creaBtn("angle-left", paginaActual === 1, () => { if (paginaActual > 1) { paginaActual--; renderUsuarios(usuariosGlobal); } }));
+
+    const info = document.createElement("span");
+    info.className = "paginacion-info";
+    info.textContent = `${inicio}-${fin} de ${totalItems}`;
+    container.appendChild(info);
+
+    container.appendChild(creaBtn("angle-right", paginaActual === totalPaginas, () => { if (paginaActual < totalPaginas) { paginaActual++; renderUsuarios(usuariosGlobal); } }));
+    container.appendChild(creaBtn("angle-double-right", paginaActual === totalPaginas, () => { paginaActual = totalPaginas; renderUsuarios(usuariosGlobal); }));
 }
 
 function abrirModal(u = null) {
@@ -213,7 +271,8 @@ async function confirmarEliminar(id) {
 
             if (res.ok) {
                 Swal.fire("Borrado", "El usuario ha sido eliminado.", "success");
-                cargarUsuarios();
+                usuariosGlobal = usuariosGlobal.filter(x => x.id != id);
+                renderUsuarios(usuariosGlobal);
             } else {
                 const d = await res.json();
                 Swal.fire("Error", d.error || "No se pudo borrar.", "error");

@@ -1,5 +1,8 @@
-// public/js/mensajes_admin.js
 const API_MENSAJES = "/api/contacto";
+
+let mensajesGlobal = [];
+let paginaActual = 1;
+const registrosPorPagina = 10;
 
 document.addEventListener("DOMContentLoaded", () => {
     cargarMensajes();
@@ -15,9 +18,7 @@ async function cargarMensajes() {
     try {
         const token = localStorage.getItem("token");
         const res = await fetch(API_MENSAJES, {
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
+            headers: { "Authorization": `Bearer ${token}` }
         });
 
         if (res.status === 401) {
@@ -27,67 +28,103 @@ async function cargarMensajes() {
         }
 
         const mensajes = await res.json();
-
-        if (mensajes.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-gray-500">No hay mensajes recibidos aún.</td></tr>`;
-            return;
-        }
-
-        tbody.innerHTML = "";
-        mensajes.forEach(m => {
-            const tr = document.createElement("tr");
-            tr.className = "hover:bg-gray-50 transition-colors border-b border-gray-100";
-
-            const fecha = new Date(m.fecha).toLocaleString("es-EC", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit"
-            });
-
-            // Usamos data attributes en lugar de onclick para cumplir con la CSP
-            tr.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-gray-500">${fecha}</td>
-                <td class="px-6 py-4 font-semibold text-gray-900">${m.nombre}</td>
-                <td class="px-6 py-4 text-pink-600 underline"><a href="mailto:${m.email}">${m.email}</a></td>
-                <td class="px-6 py-4 text-gray-600">${m.telefono || "-"}</td>
-                <td class="px-6 py-4 text-gray-600 max-w-xs truncate" title="${m.mensaje}">${m.mensaje}</td>
-                <td class="px-6 py-4 text-right space-x-2">
-                    <button class="btn-ver text-blue-600 hover:text-blue-900 font-bold" 
-                            data-nombre="${m.nombre}" data-mensaje="${m.mensaje}">Ver</button>
-                    
-                    <a href="mailto:${m.email}?subject=Respuesta a su consulta - Detalles Isabelita&body=Hola ${m.nombre},%0D%0A%0D%0AGracias por contactarnos..." 
-                       class="text-green-600 hover:text-green-900 font-bold">Responder</a>
-                    
-                    <button class="btn-eliminar text-red-600 hover:text-red-900 font-bold" 
-                            data-id="${m.id}">Eliminar</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
+        mensajesGlobal = Array.isArray(mensajes) ? mensajes : [];
+        paginaActual = 1;
+        renderMensajes(mensajesGlobal);
     } catch (error) {
         console.error("Error al cargar mensajes:", error);
         tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-red-500 font-bold">Error al conectar con el servidor.</td></tr>`;
     }
 }
 
-function configurarDelegacionEventos() {
+function renderMensajes(lista) {
     const tbody = document.getElementById("listaMensajes");
     if (!tbody) return;
+    tbody.innerHTML = "";
 
-    tbody.addEventListener("click", (e) => {
-        // Botón Ver
-        if (e.target.classList.contains("btn-ver")) {
-            const nombre = e.target.getAttribute("data-nombre");
-            const mensaje = e.target.getAttribute("data-mensaje");
-            verDetalle(nombre, mensaje);
+    if (!lista || lista.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-gray-500">No hay mensajes recibidos aún.</td></tr>`;
+        renderPaginacion(0);
+        return;
+    }
+
+    const inicio = (paginaActual - 1) * registrosPorPagina;
+    const fin = inicio + registrosPorPagina;
+    const itemsPagina = lista.slice(inicio, fin);
+
+    itemsPagina.forEach(m => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-gray-50 transition-colors border-b border-gray-100";
+        const fecha = new Date(m.fecha).toLocaleString("es-EC", {
+            day: "2-digit", month: "2-digit", year: "numeric",
+            hour: "2-digit", minute: "2-digit"
+        });
+        tr.innerHTML = `
+            <td class="px-4 py-3 whitespace-nowrap text-gray-500">${fecha}</td>
+            <td class="px-4 py-3 font-semibold text-gray-900">${m.nombre}</td>
+            <td class="px-4 py-3"><a href="mailto:${m.email}" class="text-pink-600 hover:underline">${m.email}</a></td>
+            <td class="px-4 py-3 text-gray-600">${m.telefono || "-"}</td>
+            <td class="px-4 py-3 text-gray-600 max-w-xs truncate" title="${(m.mensaje || "").replace(/"/g, '&quot;')}">${m.mensaje || ""}</td>
+            <td class="px-4 py-3 text-right">
+                <div class="flex justify-end gap-2">
+                    <button class="btn-accion-editar btn-ver" data-nombre="${(m.nombre || "").replace(/"/g, '&quot;')}" data-mensaje="${(m.mensaje || "").replace(/"/g, '&quot;')}" title="Ver">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <a href="mailto:${m.email}?subject=Respuesta - Detalles Isabelita&body=Hola ${encodeURIComponent(m.nombre || '')},%0D%0A%0D%0AGracias por contactarnos..." 
+                       class="btn-accion-editar p-2 text-green-600 hover:text-green-900" title="Responder"><i class="fas fa-reply"></i></a>
+                    <button class="btn-accion-eliminar btn-eliminar" data-id="${m.id}" title="Eliminar">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    renderPaginacion(lista.length);
+}
+
+function renderPaginacion(totalItems) {
+    const container = document.getElementById("paginacionMensajes");
+    if (!container) return;
+    container.innerHTML = "";
+    container.className = "paginacion-flechas";
+
+    const totalPaginas = Math.ceil(totalItems / registrosPorPagina);
+    if (totalPaginas <= 1) return;
+
+    const inicio = (paginaActual - 1) * registrosPorPagina + 1;
+    const fin = Math.min(paginaActual * registrosPorPagina, totalItems);
+
+    const creaBtn = (icono, disabled, fn) => {
+        const btn = document.createElement("button");
+        btn.innerHTML = `<i class="fas fa-${icono}"></i>`;
+        btn.disabled = disabled;
+        btn.onclick = () => { fn(); };
+        return btn;
+    };
+
+    container.appendChild(creaBtn("angle-double-left", paginaActual === 1, () => { paginaActual = 1; renderMensajes(mensajesGlobal); }));
+    container.appendChild(creaBtn("angle-left", paginaActual === 1, () => { if (paginaActual > 1) { paginaActual--; renderMensajes(mensajesGlobal); } }));
+
+    const info = document.createElement("span");
+    info.className = "paginacion-info";
+    info.textContent = `${inicio}-${fin} de ${totalItems}`;
+    container.appendChild(info);
+
+    container.appendChild(creaBtn("angle-right", paginaActual === totalPaginas, () => { if (paginaActual < totalPaginas) { paginaActual++; renderMensajes(mensajesGlobal); } }));
+    container.appendChild(creaBtn("angle-double-right", paginaActual === totalPaginas, () => { paginaActual = totalPaginas; renderMensajes(mensajesGlobal); }));
+}
+
+function configurarDelegacionEventos() {
+    document.getElementById("listaMensajes")?.addEventListener("click", (e) => {
+        const btnVer = e.target.closest(".btn-ver");
+        const btnEliminar = e.target.closest(".btn-eliminar");
+        if (btnVer) {
+            verDetalle(btnVer.getAttribute("data-nombre") || "", btnVer.getAttribute("data-mensaje") || "");
         }
-
-        // Botón Eliminar
-        if (e.target.classList.contains("btn-eliminar")) {
-            const id = e.target.getAttribute("data-id");
-            confirmarEliminar(id);
+        if (btnEliminar) {
+            confirmarEliminar(btnEliminar.getAttribute("data-id"));
         }
     });
 }
@@ -125,7 +162,8 @@ async function confirmarEliminar(id) {
 
             if (res.ok) {
                 Swal.fire("Eliminado", "El mensaje ha sido borrado.", "success");
-                cargarMensajes();
+                mensajesGlobal = mensajesGlobal.filter(x => x.id != id);
+                renderMensajes(mensajesGlobal);
             } else {
                 Swal.fire("Error", "No se pudo eliminar el mensaje.", "error");
             }

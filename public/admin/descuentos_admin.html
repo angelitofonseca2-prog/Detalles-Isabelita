@@ -77,23 +77,23 @@
                     </div>
 
                     <!-- Tabla -->
-                    <div class="lg:col-span-2 bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-50">
+                    <div class="lg:col-span-2 tabla-admin-estandar bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-50">
                         <div class="p-6 bg-gray-50 border-b border-gray-100">
                             <h2 class="text-lg font-bold text-gray-800">Reglas por Monto Activas</h2>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-sm text-center border-collapse" id="tabla-monto">
+                            <table class="admin-table w-full text-sm border-collapse" id="tabla-monto">
                                 <thead class="bg-pink-600 text-white">
                                     <tr>
-                                        <th class="px-6 py-4 font-bold uppercase tracking-wider">Monto mínimo</th>
-                                        <th class="px-6 py-4 font-bold uppercase tracking-wider">Porcentaje</th>
-                                        <th class="px-6 py-4 font-bold uppercase tracking-wider text-right">Acciones
-                                        </th>
+                                        <th class="px-4 py-3 text-left">Monto mínimo</th>
+                                        <th class="px-4 py-3 text-left">Porcentaje</th>
+                                        <th class="px-4 py-3 text-right">Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-100 italic text-gray-400"></tbody>
+                                <tbody class="divide-y divide-gray-100"></tbody>
                             </table>
                         </div>
+                        <div id="paginacionMonto" class="paginacion-flechas"></div>
                     </div>
                 </div>
             </section>
@@ -133,23 +133,23 @@
                     </div>
 
                     <!-- Tabla -->
-                    <div class="lg:col-span-2 bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-50">
+                    <div class="lg:col-span-2 tabla-admin-estandar bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-50">
                         <div class="p-6 bg-gray-50 border-b border-gray-100">
                             <h2 class="text-lg font-bold text-gray-800">Reglas por Cantidad Activas</h2>
                         </div>
                         <div class="overflow-x-auto">
-                            <table class="w-full text-sm text-center border-collapse" id="tabla-cantidad">
+                            <table class="admin-table w-full text-sm border-collapse" id="tabla-cantidad">
                                 <thead class="bg-pink-600 text-white">
                                     <tr>
-                                        <th class="px-6 py-4 font-bold uppercase tracking-wider">Cantidad mínima</th>
-                                        <th class="px-6 py-4 font-bold uppercase tracking-wider">Porcentaje</th>
-                                        <th class="px-6 py-4 font-bold uppercase tracking-wider text-right">Acciones
-                                        </th>
+                                        <th class="px-4 py-3 text-left">Cantidad mínima</th>
+                                        <th class="px-4 py-3 text-left">Porcentaje</th>
+                                        <th class="px-4 py-3 text-right">Acciones</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-100 italic text-gray-400"></tbody>
+                                <tbody class="divide-y divide-gray-100"></tbody>
                             </table>
                         </div>
+                        <div id="paginacionCantidad" class="paginacion-flechas"></div>
                     </div>
                 </div>
             </section>
@@ -178,19 +178,20 @@
                     </div>
 
                     <div class="overflow-x-auto">
-                        <table class="w-full text-sm text-center border-collapse" id="tabla-productos">
+                        <table class="admin-table w-full text-sm border-collapse" id="tabla-productos">
                             <thead class="bg-pink-600 text-white">
                                 <tr>
-                                    <th class="px-6 py-4 font-bold uppercase tracking-wider">Imagen</th>
-                                    <th class="px-6 py-4 font-bold uppercase tracking-wider">Producto</th>
-                                    <th class="px-6 py-4 font-bold uppercase tracking-wider">Precio Base</th>
-                                    <th class="px-6 py-4 font-bold uppercase tracking-wider">Descuento (%)</th>
-                                    <th class="px-6 py-4 font-bold uppercase tracking-wider text-right">Acción</th>
+                                    <th class="px-4 py-3 text-left">Imagen</th>
+                                    <th class="px-4 py-3 text-left">Producto</th>
+                                    <th class="px-4 py-3 text-left">Precio Base</th>
+                                    <th class="px-4 py-3 text-left">Descuento (%)</th>
+                                    <th class="px-4 py-3 text-right">Acción</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-gray-100 italic text-gray-400"></tbody>
+                            <tbody class="divide-y divide-gray-100"></tbody>
                         </table>
                     </div>
+                    <div id="paginacionProductosDesc" class="paginacion-flechas"></div>
                 </div>
             </section>
         </div>

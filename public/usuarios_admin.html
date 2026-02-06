@@ -25,25 +25,22 @@
         </div>
 
         <!-- TABLA DE USUARIOS -->
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+        <div class="tabla-admin-estandar">
             <div class="overflow-x-auto">
-                <table class="admin-table min-w-full text-sm text-left border-collapse">
-                    <thead class="bg-pink-600 text-white">
+                <table class="admin-table min-w-full text-sm border-collapse">
+                    <thead>
                         <tr>
-                            <th class="px-6 py-4 font-bold uppercase">Usuario</th>
-                            <th class="px-6 py-4 font-bold uppercase">Rol</th>
-                            <th class="px-6 py-4 font-bold uppercase">Estado</th>
-                            <th class="px-6 py-4 font-bold uppercase">Registro</th>
-                            <th class="px-6 py-4 font-bold uppercase text-right">Acciones</th>
+                            <th class="text-left">Usuario</th>
+                            <th class="text-left">Rol</th>
+                            <th class="text-left">Estado</th>
+                            <th class="text-left">Registro</th>
+                            <th class="text-right">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody id="listaUsuarios" class="divide-y divide-gray-100 italic text-gray-400">
-                        <tr>
-                            <td colspan="5" class="p-8 text-center text-gray-500">Cargando usuarios...</td>
-                        </tr>
-                    </tbody>
+                    <tbody id="listaUsuarios"></tbody>
                 </table>
             </div>
+            <div id="paginacionUsuarios" class="paginacion-flechas"></div>
         </div>
     </main>
 

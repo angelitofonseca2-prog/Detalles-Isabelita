@@ -1,8 +1,5 @@
 const API_URL = "/api/clientes";
 
-/* =====================================================
-   🔐 Helpers
-===================================================== */
 function getToken() {
   return localStorage.getItem("token") || "";
 }
@@ -13,7 +10,6 @@ function validarCedulaEcuatoriana(cedula) {
   const prov = digits[0] * 10 + digits[1];
   if (prov < 1 || prov > 24) return false;
   if (digits[2] > 5) return false;
-
   const coef = [2, 1, 2, 1, 2, 1, 2, 1, 2];
   let suma = 0;
   for (let i = 0; i < 9; i++) {
@@ -25,15 +21,11 @@ function validarCedulaEcuatoriana(cedula) {
   const decenaSuperior = Math.ceil(suma / 10) * 10;
   let resultado = decenaSuperior - suma;
   if (resultado === 10) resultado = 0;
-
   return resultado === digitoVerificador;
 }
 
 function getAuthHeaders(extra = {}) {
-  return {
-    Authorization: "Bearer " + getToken(),
-    ...extra
-  };
+  return { Authorization: "Bearer " + getToken(), ...extra };
 }
 
 function handle401(res) {
@@ -47,27 +39,20 @@ function handle401(res) {
 }
 
 /* =====================================================
-   📦 DataTable
+   Estado y Paginación
 ===================================================== */
-let dataTableClientes = null;
+let clientesGlobal = [];
+let clientesVista = [];
+let paginaActual = 1;
+const registrosPorPagina = 10;
 
 /* =====================================================
-   📌 DOM
+   DOM
 ===================================================== */
-const formCliente = document.getElementById("clienteForm");
-const cedula = document.getElementById("cedula");
-const nombre = document.getElementById("nombre");
-const correo = document.getElementById("correo");
-const telefono = document.getElementById("telefono");
-const direccion = document.getElementById("direccion");
-const btnRegistrar = document.querySelector("#clienteForm button[type='submit']");
-
 const tbodyClientes = document.getElementById("clientesBody");
-
-// Modal edición
 const modalEditarCliente = document.getElementById("modalEditarCliente");
 const formEditar = document.getElementById("formEditarCliente");
-const btnCancelarEditar = document.getElementById("btnCancelarEditarCliente"); // ✅ requiere el id en HTML
+const btnCancelarEditar = document.getElementById("btnCancelarEditarCliente");
 const editCedula = document.getElementById("editCedula");
 const editNombre = document.getElementById("editNombre");
 const editCorreo = document.getElementById("editCorreo");
@@ -75,270 +60,150 @@ const editTelefono = document.getElementById("editTelefono");
 const editDireccion = document.getElementById("editDireccion");
 
 /* =====================================================
-   ✅ Cargar clientes + DataTable (estable)
+   Cargar clientes
 ===================================================== */
 async function cargarClientes() {
   const res = await fetch(API_URL, { headers: getAuthHeaders() });
   if (handle401(res) || !res.ok) return;
 
   const clientes = await res.json();
-
-  if (!dataTableClientes) {
-    dataTableClientes = $("#tablaClientes").DataTable({
-      pageLength: 5,
-      lengthChange: false,
-      order: [[1, "asc"]],
-      autoWidth: false,
-      scrollX: true,
-
-      columnDefs: [
-        {
-          targets: "_all",          // ✅ todo alineado a la izquierda
-          className: "text-left"
-        },
-        {
-          targets: 1,               // Nombre
-          width: "25%",
-          createdCell: td => {
-            td.style.whiteSpace = "nowrap";
-          }
-        },
-        {
-          targets: 2,               // Correo
-          width: "20%",
-          createdCell: td => {
-            td.style.whiteSpace = "nowrap";
-            td.style.overflow = "hidden";
-            td.style.textOverflow = "ellipsis";
-            td.title = td.innerText;
-          }
-        },
-        {
-          targets: 3,               // Teléfono
-          width: "10%"
-        },
-        {
-          targets: 4,               // Dirección
-          width: "20%"
-        },
-        {
-          targets: 5,               // Acciones
-          width: "70px",            // 👈 ancho real fijo
-          orderable: false,
-          createdCell: td => {
-            td.style.whiteSpace = "nowrap";
-          }
-        }
-      ],
-
-      language: {
-        search: "Buscar:",
-        searchPlaceholder: "Buscar por cédula o nombre",
-        paginate: {
-          next: "Siguiente",
-          previous: "Anterior"
-        }
-      },
-      initComplete: function () {
-        $("#tablaClientes_filter input").attr("placeholder", "Buscar por cédula o nombre");
-      }
-    });
-  }
-
-  // 🔁 Limpieza y recarga segura
-  dataTableClientes.clear();
-
-  clientes.forEach(c => {
-    dataTableClientes.row.add([
-      c.cedula,
-      c.nombre,
-      c.correo,
-      c.telefono,
-      c.direccion,
-      `
-        <button type="button" class="btn-editar" data-cedula="${c.cedula}">✏️</button>
-        <button type="button" class="btn-eliminar" data-cedula="${c.cedula}">🗑️</button>
-      `
-    ]);
-  });
-
-  dataTableClientes.draw();
+  clientesGlobal = Array.isArray(clientes) ? clientes : [];
+  clientesVista = [...clientesGlobal].sort((a, b) => (a.nombre || "").localeCompare(b.nombre || ""));
+  paginaActual = 1;
+  filtrarClientes();
 }
 
+function normalizarTexto(v) {
+  return String(v || "").toLowerCase().trim();
+}
+
+function filtrarClientes() {
+  const q = normalizarTexto(document.getElementById("buscar")?.value);
+  if (!q) {
+    clientesVista = [...clientesGlobal].sort((a, b) => (a.nombre || "").localeCompare(b.nombre || ""));
+  } else {
+    clientesVista = clientesGlobal.filter(c => {
+      const ced = String(c.cedula || "");
+      const nom = normalizarTexto(c.nombre);
+      return ced.includes(q) || nom.includes(q);
+    });
+  }
+  paginaActual = 1;
+  renderTabla(clientesVista);
+}
+
+function renderTabla(lista = []) {
+  if (!tbodyClientes) return;
+  tbodyClientes.innerHTML = "";
+
+  if (!Array.isArray(lista) || lista.length === 0) {
+    tbodyClientes.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-gray-500">Sin resultados</td></tr>`;
+    renderPaginacion(0);
+    return;
+  }
+
+  const inicio = (paginaActual - 1) * registrosPorPagina;
+  const fin = inicio + registrosPorPagina;
+  const itemsPagina = lista.slice(inicio, fin);
+
+  itemsPagina.forEach(c => {
+    const tr = document.createElement("tr");
+    tr.className = "hover:bg-gray-50 transition-colors border-b border-gray-100";
+    tr.innerHTML = `
+      <td class="px-4 py-3 text-left">${c.cedula || ""}</td>
+      <td class="px-4 py-3 text-left font-semibold">${c.nombre || ""}</td>
+      <td class="px-4 py-3 text-left text-pink-600"><a href="mailto:${c.correo || ''}">${c.correo || ""}</a></td>
+      <td class="px-4 py-3 text-left">${c.telefono || ""}</td>
+      <td class="px-4 py-3 text-left">${c.direccion || ""}</td>
+      <td class="px-4 py-3 text-right">
+        <div class="flex justify-end gap-2">
+          <button type="button" class="btn-accion-editar btn-editar" data-cedula="${c.cedula}" title="Editar">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button type="button" class="btn-accion-eliminar btn-eliminar" data-cedula="${c.cedula}" title="Eliminar">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
+      </td>
+    `;
+    tbodyClientes.appendChild(tr);
+  });
+
+  renderPaginacion(lista.length);
+}
+
+function renderPaginacion(totalItems) {
+  const container = document.getElementById("paginacionControls");
+  if (!container) return;
+  container.innerHTML = "";
+  container.className = "paginacion-flechas";
+
+  const totalPaginas = Math.ceil(totalItems / registrosPorPagina);
+  if (totalPaginas <= 1) return;
+
+  const inicio = (paginaActual - 1) * registrosPorPagina + 1;
+  const fin = Math.min(paginaActual * registrosPorPagina, totalItems);
+
+  const creaBoton = (icono, title, disabled, onClick) => {
+    const btn = document.createElement("button");
+    btn.innerHTML = `<i class="fas fa-${icono}"></i>`;
+    btn.title = title;
+    btn.disabled = disabled;
+    btn.onclick = onClick;
+    return btn;
+  };
+
+  container.appendChild(creaBoton("angle-double-left", "Primera página", paginaActual === 1, () => { paginaActual = 1; renderTabla(clientesVista); }));
+  container.appendChild(creaBoton("angle-left", "Anterior", paginaActual === 1, () => { if (paginaActual > 1) { paginaActual--; renderTabla(clientesVista); } }));
+
+  const info = document.createElement("span");
+  info.className = "paginacion-info";
+  info.textContent = `${inicio}-${fin} de ${totalItems}`;
+  container.appendChild(info);
+
+  container.appendChild(creaBoton("angle-right", "Siguiente", paginaActual === totalPaginas, () => { if (paginaActual < totalPaginas) { paginaActual++; renderTabla(clientesVista); } }));
+  container.appendChild(creaBoton("angle-double-right", "Última página", paginaActual === totalPaginas, () => { paginaActual = totalPaginas; renderTabla(clientesVista); }));
+}
 
 /* =====================================================
-   🖱️ Delegación de eventos (única y estable)
+   Delegación de eventos
 ===================================================== */
 tbodyClientes.addEventListener("click", (e) => {
   const btnEditar = e.target.closest(".btn-editar");
   const btnEliminar = e.target.closest(".btn-eliminar");
-
-  if (btnEditar) {
-    abrirEditarCliente(btnEditar.dataset.cedula);
-    return;
-  }
-  if (btnEliminar) {
-    confirmarEliminarCliente(btnEliminar.dataset.cedula);
-    return;
-  }
+  if (btnEditar) { abrirEditarCliente(btnEditar.dataset.cedula); return; }
+  if (btnEliminar) { confirmarEliminarCliente(btnEliminar.dataset.cedula); return; }
 });
 
-/* =====================================================
-   🔎 Verificar existencia por cédula (auth)
-===================================================== */
-async function verificarCedulaExiste(ced) {
-  const res = await fetch(`/api/clientes/publico/${ced}`);
-  return res.ok;
-}
-
+document.getElementById("buscar")?.addEventListener("input", filtrarClientes);
 
 /* =====================================================
-   ⚡ Validar cédula al salir del campo (tu UX original)
-===================================================== */
-if (cedula) {
-  cedula.addEventListener("blur", async () => {
-    const valor = cedula.value.trim();
-    if (!valor) return;
-
-    if (!/^[0-9]{10}$/.test(valor)) {
-      Swal.fire("Error", "La cédula debe tener exactamente 10 dígitos.", "error");
-      if (btnRegistrar) btnRegistrar.disabled = true;
-      return;
-    }
-
-    try {
-      const existe = await verificarCedulaExiste(valor);
-      if (existe) {
-        Swal.fire({
-          icon: "info",
-          title: "Cédula registrada",
-          text: "El cliente ya existe y se muestra en el listado."
-        });
-        dataTableClientes?.search(valor).draw();
-        if (btnRegistrar) btnRegistrar.disabled = true;
-        return;
-      }
-      if (btnRegistrar) btnRegistrar.disabled = false;
-    } catch (err) {
-      console.error(err);
-      if (btnRegistrar) btnRegistrar.disabled = false;
-    }
-  });
-}
-
-/* =====================================================
-   🧾 Registrar cliente (mantiene tu validación + precheck)
-===================================================== */
-if (formCliente) {
-  formCliente.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const data = {
-      cedula: cedula.value.trim(),
-      nombre: nombre.value.trim().toUpperCase(),
-      correo: correo.value.trim().toUpperCase(),
-      telefono: telefono.value.trim(),
-      direccion: direccion.value.trim().toUpperCase()
-    };
-
-    if (!/^[0-9]{10}$/.test(data.cedula)) {
-      Swal.fire("Error", "La cédula debe tener exactamente 10 dígitos.", "error");
-      return;
-    }
-
-    btnRegistrar.disabled = true;
-
-    // ✅ Mantener tu verificación previa (UX)
-    const existe = await verificarCedulaExiste(data.cedula);
-    if (existe) {
-      Swal.fire("Cédula registrada", "Ya existe un cliente con esta cédula.", "warning");
-      btnRegistrar.disabled = false;
-      return;
-    }
-
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: getAuthHeaders({ "Content-Type": "application/json" }),
-      body: JSON.stringify(data)
-    });
-
-    if (handle401(res)) return;
-
-    if (!res.ok) {
-      // ✅ Mensaje más exacto si backend devuelve 409
-      if (res.status === 409) {
-        const msg = await safeReadError(res);
-        Swal.fire("Duplicado", msg || "La cédula o el correo ya están registrados.", "warning");
-      } else {
-        Swal.fire("Error", "No se pudo registrar el cliente.", "error");
-      }
-      btnRegistrar.disabled = false;
-      return;
-    }
-
-    Swal.fire("Éxito", "Cliente registrado correctamente.", "success");
-    e.target.reset();
-    btnRegistrar.disabled = false;
-    await cargarClientes();
-    dataTableClientes?.search("").draw();
-  });
-}
-
-async function safeReadError(res) {
-  try {
-    const j = await res.json();
-    return j?.error || j?.mensaje || "";
-  } catch {
-    return "";
-  }
-}
-
-/* =====================================================
-   ✏️ Abrir edición
+   Editar / Eliminar
 ===================================================== */
 async function abrirEditarCliente(cedulaVal) {
   const res = await fetch(`${API_URL}/${cedulaVal}`, { headers: getAuthHeaders() });
   if (handle401(res)) return;
-
-  if (!res.ok) {
-    Swal.fire("Error", "No se pudo obtener el cliente", "error");
-    return;
-  }
+  if (!res.ok) { Swal.fire("Error", "No se pudo obtener el cliente", "error"); return; }
 
   const cliente = await res.json();
-
   editCedula.value = cliente.cedula ?? "";
   editNombre.value = cliente.nombre ?? "";
   editCorreo.value = cliente.correo ?? "";
   editTelefono.value = cliente.telefono ?? "";
   editDireccion.value = cliente.direccion ?? "";
-
-  // Guardamos la cédula original para saber a cuál actualizar
   document.getElementById("editIdCliente").value = cliente.cedula;
-
-  // Habilitamos o deshabilitamos? El requerimiento dice que se debe poder corregir.
-  editCedula.disabled = false;
   modalEditarCliente.classList.add("flex");
   modalEditarCliente.classList.remove("hidden");
 }
 
-/* =====================================================
-   ✅ Cerrar modal (sin onclick)
-===================================================== */
 function cerrarModalEditarCliente() {
   modalEditarCliente.classList.add("hidden");
   modalEditarCliente.classList.remove("flex");
-  editCedula.disabled = false;
 }
-
 btnCancelarEditar?.addEventListener("click", cerrarModalEditarCliente);
 
-/* =====================================================
-   💾 Confirmar edición
-===================================================== */
 formEditar.addEventListener("submit", async (e) => {
   e.preventDefault();
-
   const cedulaOriginal = document.getElementById("editIdCliente").value;
   const nuevaCedula = editCedula.value.trim();
 
@@ -351,7 +216,7 @@ formEditar.addEventListener("submit", async (e) => {
     method: "PUT",
     headers: getAuthHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify({
-      nuevaCedula: nuevaCedula,
+      nuevaCedula,
       nombre: editNombre.value.trim().toUpperCase(),
       correo: editCorreo.value.trim().toUpperCase(),
       telefono: editTelefono.value.trim(),
@@ -360,33 +225,17 @@ formEditar.addEventListener("submit", async (e) => {
   });
 
   if (handle401(res)) return;
-
   if (!res.ok) {
-    if (res.status === 409) {
-      const msg = await safeReadError(res);
-      Swal.fire("Duplicado", msg || "El correo ya está registrado.", "warning");
-    } else {
-      Swal.fire("Error", "No se pudo actualizar el cliente", "error");
-    }
+    const msg = await res.json().catch(() => ({}));
+    Swal.fire("Error", msg.error || msg.mensaje || "No se pudo actualizar", "error");
     return;
   }
 
-  Swal.fire({
-    icon: "success",
-    title: "Guardado con éxito",
-    text: "Los datos del cliente fueron actualizados correctamente."
-  });
-
+  Swal.fire("Éxito", "Cliente actualizado correctamente.", "success");
   cerrarModalEditarCliente();
   await cargarClientes();
-
-  // ✅ Mantener tu limpieza de filtro
-  dataTableClientes?.search("").draw();
 });
 
-/* =====================================================
-   ❌ Eliminar (SweetAlert2, sin confirm())
-===================================================== */
 async function confirmarEliminarCliente(ced) {
   const { isConfirmed } = await Swal.fire({
     title: "¿Eliminar este cliente?",
@@ -399,35 +248,17 @@ async function confirmarEliminarCliente(ced) {
 
   if (!isConfirmed) return;
 
-  const res = await fetch(`${API_URL}/${ced}`, {
-    method: "DELETE",
-    headers: getAuthHeaders()
-  });
-
+  const res = await fetch(`${API_URL}/${ced}`, { method: "DELETE", headers: getAuthHeaders() });
   if (handle401(res)) return;
 
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
-    const mensajeError = errorData.error || "No se pudo eliminar el cliente";
-
-    Swal.fire("No se pudo eliminar", mensajeError, "error");
+    const err = await res.json().catch(() => ({}));
+    Swal.fire("Error", err.error || "No se pudo eliminar", "error");
     return;
   }
 
-  Swal.fire({
-    icon: "success",
-    title: "Eliminado",
-    timer: 900,
-    showConfirmButton: false
-  });
-
+  Swal.fire("Eliminado", "Cliente eliminado.", "success");
   await cargarClientes();
-  dataTableClientes?.search("").draw();
 }
 
-/* =====================================================
-   🚀 Init
-===================================================== */
-document.addEventListener("DOMContentLoaded", () => {
-  cargarClientes();
-});
+document.addEventListener("DOMContentLoaded", () => cargarClientes());
