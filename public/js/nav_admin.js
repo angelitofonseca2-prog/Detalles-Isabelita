@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       <div class="flex items-center gap-3">
           <button type="button" class="site-nav-burger" aria-label="Abrir menú">☰</button>
           <a href="/index.html" class="flex items-center shrink-0">
-              <img src="/resources/logo.png" alt="Isabel, Detalles Eternos" class="site-nav-logo">
+              <img src="/resources/logo.png?v=2" alt="Isabel, Detalles Eternos" class="site-nav-logo">
           </a>
       </div>
 

@@ -169,6 +169,10 @@ const staticOptions = {
     if (filePath.endsWith(".html")) {
       res.setHeader("Cache-Control", "no-cache");
     }
+    // CSS y JS: permitir cache pero validar con servidor (evita caché vieja en deploys)
+    if (filePath.endsWith(".css") || filePath.endsWith(".js")) {
+      res.setHeader("Cache-Control", "public, max-age=0, must-revalidate");
+    }
   }
 };
 
