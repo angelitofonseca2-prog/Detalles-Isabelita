@@ -135,13 +135,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* -----------------------------------------
    ACTUALIZAR CONTADOR DEL CARRITO
+   Exponer globalmente para que catalogo.js, carrito.js, etc. lo usen
 ------------------------------------------ */
-
 function actualizarContadorCarrito() {
-    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-
-    // Sumar cantidades
-    let total = carrito.reduce((acum, item) => acum + Number(item.cantidad), 0);
+    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    const total = carrito.reduce((acum, item) => acum + (Number(item.cantidad) || 0), 0);
 
     const span = document.getElementById("contadorCarrito");
     if (span) span.textContent = total;
@@ -150,8 +148,13 @@ function actualizarContadorCarrito() {
     if (floatSpan) floatSpan.textContent = total;
 }
 
+window.actualizarContadorCarrito = actualizarContadorCarrito;
+
 // Ejecutar cuando cargue el DOM
 document.addEventListener("DOMContentLoaded", actualizarContadorCarrito);
 
-// Escuchar cambios del carrito desde otras páginas
+// Escuchar cambios del carrito desde otras pestañas
 window.addEventListener("storage", actualizarContadorCarrito);
+
+// Escuchar cuando se modifica el carrito en esta pestaña
+window.addEventListener("carritoActualizado", actualizarContadorCarrito);

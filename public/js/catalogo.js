@@ -1,18 +1,4 @@
-/* ============================================
-   ACTUALIZAR CONTADOR DEL CARRITO
-=============================================== */
-function actualizarContadorCarrito() {
-  const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-  const total = carrito.reduce((acc, p) => acc + p.cantidad, 0);
-
-  const interval = setInterval(() => {
-    const elemento = document.getElementById("contadorCarrito");
-    if (elemento) {
-      elemento.innerText = total;
-      clearInterval(interval);
-    }
-  }, 50);
-}
+/* actualizarContadorCarrito está definida en nav_public.js y se usa al agregar al carrito */
 
 /* ============================================
    INICIO
@@ -172,7 +158,12 @@ function agregarAlCarrito(producto) {
   }
 
   localStorage.setItem("carrito", JSON.stringify(carrito));
-  actualizarContadorCarrito();
+
+  // Actualizar contador (función de nav_public) y disparar evento para redundancia
+  if (typeof window.actualizarContadorCarrito === "function") {
+    window.actualizarContadorCarrito();
+  }
+  window.dispatchEvent(new CustomEvent("carritoActualizado"));
 
   Swal.fire({
     icon: "success",

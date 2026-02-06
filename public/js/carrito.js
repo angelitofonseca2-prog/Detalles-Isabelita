@@ -18,6 +18,10 @@ let descuentoAplicado = 0;
 ====================================================== */
 function guardarCarrito() {
     localStorage.setItem("carrito", JSON.stringify(carrito));
+    if (typeof window.actualizarContadorCarrito === "function") {
+        window.actualizarContadorCarrito();
+    }
+    window.dispatchEvent(new CustomEvent("carritoActualizado"));
 }
 
 /* ======================================================
