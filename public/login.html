@@ -3,18 +3,21 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Iniciar Sesión - Florería Detalles Isabelita</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso administrador - Isabel, Detalles Eternos</title>
 
     <!-- Tailwind permitido porque ya lo habilitaste en CSP -->
     <link rel="stylesheet" href="/css/output.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
 </head>
 
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
 
-    <div class="bg-white shadow-lg rounded-xl p-8 w-full max-w-md">
-        <h2 class="text-2xl font-bold text-center mb-6 text-green-700">
-            Iniciar Sesión
+    <div class="bg-white shadow-lg rounded-xl p-6 sm:p-8 w-full max-w-md">
+        <h2 class="text-2xl font-bold text-center mb-1 text-green-700">
+            Acceso administrador
         </h2>
+        <p class="text-center text-gray-500 text-sm mb-6">Para personal de la tienda</p>
 
         <form id="loginForm" class="space-y-4">
 
@@ -30,10 +33,16 @@
                     class="w-full border p-2 rounded focus:outline-none focus:ring focus:ring-green-300" required>
             </div>
 
-            <button type="submit"
-                class="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-lg font-semibold transition">
-                Ingresar
-            </button>
+            <div class="flex flex-col gap-3 w-full">
+                <button type="submit"
+                    class="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition">
+                    Ingresar
+                </button>
+                <a href="/index.html" role="button"
+                    class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 rounded-lg font-semibold transition text-center block">
+                    Cancelar
+                </a>
+            </div>
         </form>
 
         <p id="msg" class="text-center mt-4 text-red-600 font-semibold"></p>
@@ -69,14 +78,16 @@
                 localStorage.setItem("nombre", data.usuario.nombre);
                 localStorage.setItem("usuario_id", data.usuario.id);
 
-                // (opcional) console.log para auditoría
-                console.log("TOKEN EN LOGIN:", localStorage.getItem("token"));
-
-                window.location.href = "/pedidos_admin.html";
-
-
-                alert("Inicio de sesión exitoso");
-
+                // Mensaje que se oculta solo y luego redirige (sin botón Aceptar)
+                Swal.fire({
+                    icon: "success",
+                    title: "Inicio de sesión exitoso",
+                    timer: 1500,
+                    timerProgressBar: true,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = "/pedidos_admin.html";
+                });
 
             } catch (error) {
                 alert("No se pudo conectar con el servidor");

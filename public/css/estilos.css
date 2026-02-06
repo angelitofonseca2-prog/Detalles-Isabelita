@@ -1,3 +1,23 @@
+/* =========================================
+   BASE MÓVIL – Evitar distorsión
+   ========================================= */
+html {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  overflow-x: hidden;
+  min-width: 0;
+}
+img {
+  max-width: 100%;
+  height: auto;
+}
+/* Evitar overflow en contenedores */
+* {
+  box-sizing: border-box;
+}
+
 .oculto {
   display: none !important;
 }
@@ -176,24 +196,63 @@ tr.estado-cancelado {
   z-index: 80;
 }
 
+.site-nav-burger {
+  display: none;
+  background: transparent;
+  border: 2px solid rgba(255,255,255,0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.25rem;
+}
+.site-nav-burger:hover {
+  background: rgba(255,255,255,0.2);
+}
+
 @media (max-width: 768px) {
   .site-nav {
-    gap: 8px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .site-nav-burger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .site-nav-wrap {
+    width: 100%;
+    order: 3;
+    display: none;
+  }
+  .site-nav-wrap.open {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
   .site-nav-menu {
+    flex-direction: column;
     width: 100%;
-    overflow-x: auto;
-    white-space: nowrap;
-    padding-bottom: 6px;
-    gap: 12px;
-    scrollbar-width: thin;
+    gap: 8px;
+    padding-top: 8px;
   }
   .site-nav-menu li {
-    flex: 0 0 auto;
+    flex: none;
   }
   .site-nav-actions {
     width: 100%;
     justify-content: flex-start;
+  }
+}
+
+@media (min-width: 769px) {
+  .site-nav-burger {
+    display: none !important;
+  }
+  .site-nav-wrap {
+    display: flex !important;
+    width: auto;
   }
 }
 

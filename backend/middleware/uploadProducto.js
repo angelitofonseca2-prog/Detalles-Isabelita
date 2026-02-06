@@ -1,5 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
-import { CloudinaryStorage } from "multer-storage-cloudinary";
+import createCloudinaryStorage from "multer-storage-cloudinary";
 import multer from "multer";
 import dotenv from "dotenv";
 
@@ -24,8 +24,8 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configuración del storage
-const storage = new CloudinaryStorage({
+// Configuración del storage (el paquete exporta una función, no la clase)
+const storage = createCloudinaryStorage({
   cloudinary,
   params: {
     folder: "floreria_productos",

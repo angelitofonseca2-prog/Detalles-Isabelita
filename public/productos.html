@@ -25,20 +25,20 @@
 
     <!-- Filtros -->
     <div class="max-w-6xl mx-auto px-4 mb-8 flex flex-wrap gap-4 justify-center items-end">
-      <div class="flex flex-col text-left">
+      <div class="flex flex-col text-left w-full sm:w-auto min-w-0">
         <label for="filtroNombre" class="text-sm font-semibold text-gray-600 mb-1">Nombre</label>
-        <input type="text" id="filtroNombre" placeholder="Buscar producto..." class="border rounded px-3 py-2 w-64">
+        <input type="text" id="filtroNombre" placeholder="Buscar producto..." class="border rounded px-3 py-2 w-full sm:w-64 max-w-full">
       </div>
-      <div class="flex flex-col text-left">
+      <div class="flex flex-col text-left w-full sm:w-auto min-w-0">
         <label for="filtroPrecioMin" class="text-sm font-semibold text-gray-600 mb-1">Precio Mín</label>
-        <input type="number" id="filtroPrecioMin" placeholder="0" class="border rounded px-3 py-2 w-24">
+        <input type="number" id="filtroPrecioMin" placeholder="0" class="border rounded px-3 py-2 w-full sm:w-24 max-w-full">
       </div>
-      <div class="flex flex-col text-left">
+      <div class="flex flex-col text-left w-full sm:w-auto min-w-0">
         <label for="filtroPrecioMax" class="text-sm font-semibold text-gray-600 mb-1">Precio Máx</label>
-        <input type="number" id="filtroPrecioMax" placeholder="Max" class="border rounded px-3 py-2 w-24">
+        <input type="number" id="filtroPrecioMax" placeholder="Max" class="border rounded px-3 py-2 w-full sm:w-24 max-w-full">
       </div>
       <button id="btnLimpiarFiltros"
-        class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded h-10 mt-6">Limpiar</button>
+        class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded h-10">Limpiar</button>
     </div>
 
     <div id="listaProductos" class="grid gap-6 md:grid-cols-3 max-w-6xl mx-auto px-4"></div>
@@ -119,7 +119,7 @@
   </div>
 
   <footer class="bg-pink-600 text-white text-center py-6 mt-10">
-    <p>&copy; 2025 Florería Detalles Isabelita | Todos los derechos reservados</p>
+    <p class="font-semibold">2026 - Isabel, detalles eternos</p>
   </footer>
 
   <script src="./js/productos.js" defer></script>

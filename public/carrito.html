@@ -8,6 +8,7 @@
 
     <!-- Tailwind -->
     <link rel="stylesheet" href="/css/output.css">
+    <link rel="stylesheet" href="/css/estilos.css">
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js" defer></script>
@@ -24,7 +25,7 @@
 <body class="bg-[#fff7f2] text-gray-900 font-sans">
 
 
-    <main class="max-w-5xl mx-auto mt-10 p-6 bg-white rounded-xl shadow">
+    <main class="max-w-5xl mx-auto mt-6 sm:mt-10 p-4 sm:p-6 bg-white rounded-xl shadow mx-2 sm:mx-auto">
 
         <!-- ============================================================ -->
         <!-- 🛒 CARRITO DE PRODUCTOS -->
@@ -36,7 +37,8 @@
             Tu carrito está vacío. Agrega productos para continuar.
         </div>
 
-        <table class="table-auto w-full mb-6" id="tablaCarrito">
+        <div class="overflow-x-auto mb-6 -mx-2 sm:mx-0">
+        <table class="table-auto w-full min-w-[480px] mb-6" id="tablaCarrito">
             <thead class="bg-[#f4b183] text-white">
                 <tr>
                     <th class="px-4 py-2">Producto</th>
@@ -48,6 +50,7 @@
             </thead>
             <tbody id="tbodyCarrito"></tbody>
         </table>
+        </div>
 
         <div class="text-right text-xl font-bold mb-8">
             Total: $<span id="totalCarrito">0.00</span>
