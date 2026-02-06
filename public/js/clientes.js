@@ -63,33 +63,14 @@ const editDireccion = document.getElementById("editDireccion");
    Cargar clientes
 ===================================================== */
 async function cargarClientes() {
-  try {
-    const res = await fetch(API_URL, { headers: getAuthHeaders() });
-    if (handle401(res)) return;
+  const res = await fetch(API_URL, { headers: getAuthHeaders() });
+  if (handle401(res) || !res.ok) return;
 
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      clientesGlobal = [];
-      clientesVista = [];
-      paginaActual = 1;
-      renderTabla([]);
-      Swal.fire("Error", err.error || err.mensaje || "No se pudieron cargar los clientes.", "error");
-      return;
-    }
-
-    const clientes = await res.json();
-    clientesGlobal = Array.isArray(clientes) ? clientes : [];
-    clientesVista = [...clientesGlobal].sort((a, b) => (a.nombre || "").localeCompare(b.nombre || ""));
-    paginaActual = 1;
-    filtrarClientes();
-  } catch (e) {
-    console.error("Error cargarClientes:", e);
-    clientesGlobal = [];
-    clientesVista = [];
-    paginaActual = 1;
-    renderTabla([]);
-    Swal.fire("Error", "Error de conexión. Revisa que el servidor esté en marcha.", "error");
-  }
+  const clientes = await res.json();
+  clientesGlobal = Array.isArray(clientes) ? clientes : [];
+  clientesVista = [...clientesGlobal].sort((a, b) => (a.nombre || "").localeCompare(b.nombre || ""));
+  paginaActual = 1;
+  filtrarClientes();
 }
 
 function normalizarTexto(v) {

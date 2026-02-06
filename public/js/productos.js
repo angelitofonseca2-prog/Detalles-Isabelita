@@ -87,6 +87,7 @@ async function cargarCategorias(selectId) {
    📦 Mostrar productos
 ================================================= */
 async function mostrarProductos() {
+  if (listaProductos) listaProductos.innerHTML = `<p class="col-span-full text-center text-gray-500 py-12 animate-pulse">Cargando productos…</p>`;
   try {
     const res = await fetch(API_URL);
     const productos = await res.json();
@@ -102,27 +103,25 @@ function renderizarProductos(productos) {
   listaProductos.innerHTML = "";
 
   if (!productos || productos.length === 0) {
-    listaProductos.innerHTML =
-      `<p class="text-center text-gray-500 col-span-3">No hay productos que coincidan con la búsqueda</p>`;
+    listaProductos.innerHTML = `<p class="col-span-full text-center text-gray-500 py-12">No hay productos que coincidan. Ajusta los filtros o haz clic en &quot;Nuevo Producto&quot; para agregar uno.</p>`;
     return;
   }
 
   productos.forEach(p => {
     const card = document.createElement("div");
-    card.className = "bg-white p-4 rounded-xl shadow-lg text-center";
+    card.className = "bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow";
 
     card.innerHTML = `
-        <img src="${p.imagen}" class="w-full h-64 object-cover rounded-t-lg" alt="${p.nombre}">
-        <h3 class="text-xl font-bold text-pink-600 mt-2">${p.nombre}</h3>
-        <p class="text-gray-700">${p.descripcion || ""}</p>
-        <p class="font-semibold text-lg mt-2">$${p.precio}</p>
-        <p class="text-sm text-gray-500">Stock: ${p.stock}</p>
-
-        <div class="mt-4 flex justify-center gap-3">
-          <button class="btn-editar bg-yellow-400 text-white px-4 py-2 rounded"
-            data-id="${p.id}">Editar</button>
-          <button class="btn-eliminar bg-red-500 text-white px-4 py-2 rounded"
-            data-id="${p.id}">Eliminar</button>
+        <img src="${p.imagen}" class="w-full h-48 object-cover rounded-t-xl" alt="${p.nombre}">
+        <div class="p-4">
+          <h3 class="text-lg font-bold text-pink-600">${p.nombre}</h3>
+          <p class="text-gray-600 text-sm truncate">${(p.descripcion || "").slice(0, 60)}${(p.descripcion || "").length > 60 ? "…" : ""}</p>
+          <p class="font-bold text-pink-600 mt-2">$${p.precio}</p>
+          <p class="text-xs text-gray-500">Stock: ${p.stock}</p>
+          <div class="mt-4 flex justify-center gap-2">
+            <button class="btn-editar bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-sm font-semibold" data-id="${p.id}"><i class="fas fa-edit mr-1"></i> Editar</button>
+            <button class="btn-eliminar bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-semibold" data-id="${p.id}"><i class="fas fa-trash-alt mr-1"></i> Eliminar</button>
+          </div>
         </div>
       `;
 
