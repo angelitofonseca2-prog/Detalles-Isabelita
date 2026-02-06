@@ -15,6 +15,8 @@ dotenv.config({ path: path.join(__dirname, "..", ".env") });
 // ✅ Crear pool de conexiones (password vacío si no se define DB_PASS)
 // En Windows, usar 127.0.0.1 evita timeouts si "localhost" se resuelve por IPv6
 const dbHost = process.env.DB_HOST || "localhost";
+const TZ_ECUADOR = "-05:00";
+
 const pool = mysql.createPool({
   host: dbHost === "localhost" ? "127.0.0.1" : dbHost,
   user: process.env.DB_USER || "root",
@@ -27,16 +29,17 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
+  timezone: TZ_ECUADOR,
 });
 
-// ⏰ Fijar zona horaria de la sesión (Ecuador UTC-5)
-pool.on("connection", (conn) => {
-  conn.promise()
-    .query("SET time_zone = '-05:00'")
-    .catch((err) => {
-      console.error("❌ Error configurando zona horaria MySQL:", err);
-    });
-});
+// ⏰ Asegurar zona horaria Ecuador (UTC-5) en cada conexión ANTES de usarla
+// pool.on("connection") es asíncrono y puede no completar antes del primer query
+const originalGetConnection = pool.getConnection.bind(pool);
+pool.getConnection = async function () {
+  const conn = await originalGetConnection();
+  await conn.query("SET time_zone = ?", [TZ_ECUADOR]);
+  return conn;
+};
 
 // Mensaje de confirmación
 pool
