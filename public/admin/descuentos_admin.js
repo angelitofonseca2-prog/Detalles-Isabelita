@@ -233,40 +233,59 @@ document.querySelector("#btn-agregar-cantidad").addEventListener("click", async 
 
 
 // ===============================================================
-//  EDITAR DESCUENTO
+//  EDITAR DESCUENTO (modal como en otras pestañas)
 // ===============================================================
-function editarDescuento(id, tipo, minimo, porcentaje) {
-    Swal.fire({
-        title: "Editar descuento",
-        html: `
-            <div class="mb-4 text-left">
-                <label class="block text-gray-700 font-bold mb-2">Mínimo (Monto $ o Cantidad)</label>
-                <input id="edit-minimo" type="number" step="0.01" value="${minimo}" placeholder="Ej: 50.00"
-                       class="swal2-input m-0 w-full">
-            </div>
-            <div class="text-left">
-                <label class="block text-gray-700 font-bold mb-2">Porcentaje de Descuento (%)</label>
-                <input id="edit-porcentaje" type="number" step="0.01" value="${porcentaje}" placeholder="Ej: 10"
-                       class="swal2-input m-0 w-full">
-            </div>
-        `,
-        confirmButtonText: "Guardar cambios",
-        preConfirm: () => ({
-            minimo: document.getElementById("edit-minimo").value,
-            porcentaje: document.getElementById("edit-porcentaje").value
-        })
-    }).then(async r => {
-        if (!r.value) return;
+const modalEditarDescuento = document.getElementById("modalEditarDescuento");
+const formEditarDescuento = document.getElementById("formEditarDescuento");
+const editDescuentoId = document.getElementById("editDescuentoId");
+const editDescuentoTipo = document.getElementById("editDescuentoTipo");
+const editDescuentoMinimo = document.getElementById("editDescuentoMinimo");
+const editDescuentoPorcentaje = document.getElementById("editDescuentoPorcentaje");
 
-        await fetch(`/api/descuentos/${id}`, {
+function abrirModalEditarDescuento(id, tipo, minimo, porcentaje) {
+    editDescuentoId.value = id;
+    editDescuentoTipo.value = tipo || "";
+    editDescuentoMinimo.value = minimo ?? "";
+    editDescuentoPorcentaje.value = porcentaje ?? "";
+    modalEditarDescuento.classList.remove("hidden");
+    modalEditarDescuento.classList.add("flex");
+}
+
+function cerrarModalEditarDescuento() {
+    modalEditarDescuento.classList.add("hidden");
+    modalEditarDescuento.classList.remove("flex");
+    formEditarDescuento.reset();
+}
+
+document.getElementById("btnCancelarEditarDescuento")?.addEventListener("click", cerrarModalEditarDescuento);
+document.getElementById("btnCerrarModalEditarDescuento")?.addEventListener("click", cerrarModalEditarDescuento);
+
+formEditarDescuento?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const id = editDescuentoId.value;
+    const minimo = editDescuentoMinimo.value;
+    const porcentaje = editDescuentoPorcentaje.value;
+    if (!minimo || !porcentaje) {
+        Swal.fire("Error", "Completa todos los campos", "error");
+        return;
+    }
+    try {
+        const res = await fetch(`/api/descuentos/${id}`, {
             method: "PUT",
             headers: getAuthHeaders({ "Content-Type": "application/json" }),
-            body: JSON.stringify(r.value)
+            body: JSON.stringify({ minimo, porcentaje })
         });
-
+        if (!res.ok) throw new Error("Error al actualizar");
         Swal.fire("OK", "Descuento actualizado", "success");
+        cerrarModalEditarDescuento();
         cargarDescuentos();
-    });
+    } catch (err) {
+        Swal.fire("Error", "No se pudo actualizar el descuento", "error");
+    }
+});
+
+function editarDescuento(id, tipo, minimo, porcentaje) {
+    abrirModalEditarDescuento(id, tipo, minimo, porcentaje);
 }
 
 
