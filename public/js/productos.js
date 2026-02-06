@@ -320,6 +320,12 @@ function cerrarModalEditar() {
 }
 
 btnCancelarEditar.addEventListener("click", cerrarModalEditar);
+document.getElementById("btnCerrarModalEditar")?.addEventListener("click", cerrarModalEditar);
+
+document.getElementById("btnCerrarModalNuevo")?.addEventListener("click", () => {
+  modalNuevo.classList.add("hidden");
+  modalNuevo.classList.remove("flex");
+});
 
 /* =================================================
    🚀 Init
