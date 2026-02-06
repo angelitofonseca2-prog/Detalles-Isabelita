@@ -826,6 +826,7 @@ async function crearPedidoAutomatico() {
 
 
         currentOrderId = data.pedidoId || data.pedido_id;
+        pedidoYaCreado = true; // Evitar duplicados en clics subsiguientes
 
         // 4️⃣ GUARDAR RESULTADOS REALES
         totalConDescuento = data.totalFinal;
@@ -999,8 +1000,14 @@ if (metodoPagoSelect) {
 const btnFinalizar = document.getElementById("btnFinalizar");
 if (btnFinalizar) {
     btnFinalizar.addEventListener("click", async () => {
+        // Evitar doble clic mientras se procesa
+        if (btnFinalizar.disabled) return;
+        btnFinalizar.disabled = true;
+        let redirigiendo = false;
+
         const metodo = document.getElementById("metodoPago").value;
 
+        try {
         // ⚠️ Crear pedido si aún no existe
         // NO crear pedido automáticamente aquí
         // Solo permitir crear pedido en la sección de pago
@@ -1024,10 +1031,7 @@ if (btnFinalizar) {
            🟩 PAGO EN EFECTIVO
            =============================== */
         if (metodo === "efectivo") {
-            // En efectivo, crearPedido ya lo deja marcado como pagado (ATÓMICO en backend)
-            const creado = await crearPedidoAutomatico();
-            if (!creado) return;
-
+            // El pedido ya se creó arriba (con metodo_pago=efectivo) - no volver a llamar crearPedidoAutomatico
             localStorage.removeItem("carrito");
 
             Swal.fire({
@@ -1038,6 +1042,7 @@ if (btnFinalizar) {
                 showConfirmButton: false
             });
 
+            redirigiendo = true;
             window.location.href = `/exito.html?id=${currentOrderId}&total=${totalConDescuento}&metodo=efectivo`;
             return;
         }
@@ -1080,8 +1085,12 @@ if (btnFinalizar) {
                 showConfirmButton: false
             });
 
+            redirigiendo = true;
             window.location.href = `/exito.html?id=${currentOrderId}&total=${totalConDescuento}&metodo=transferencia`;
             return;
+        }
+        } finally {
+            if (!redirigiendo) btnFinalizar.disabled = false; // Re-habilitar solo si hubo error
         }
     });
 }
