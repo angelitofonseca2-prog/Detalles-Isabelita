@@ -333,6 +333,11 @@ body.nav-mobile .site-nav-burger {
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
   overflow: hidden;
 }
+.tabla-admin-estandar .admin-table {
+  /* En móvil evita que las columnas se colapsen demasiado
+     y permite scroll horizontal dentro del contenedor */
+  min-width: 640px;
+}
 .tabla-admin-estandar thead {
   background: #db2777;
   color: white;
