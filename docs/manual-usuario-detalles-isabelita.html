@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manual de Usuario - Florería Detalles Isabelita</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', -apple-system, sans-serif; line-height: 1.6; color: #333; max-width: 800px; margin: 0 auto; padding: 40px 24px; }
+    h1 { color: #db2777; font-size: 2rem; margin-bottom: 8px; border-bottom: 3px solid #db2777; padding-bottom: 8px; }
+    h2 { color: #be185d; font-size: 1.4rem; margin-top: 32px; margin-bottom: 12px; }
+    h3 { color: #9d174d; font-size: 1.15rem; margin-top: 20px; margin-bottom: 8px; }
+    p { margin-bottom: 12px; }
+    ul, ol { margin-left: 24px; margin-bottom: 16px; }
+    li { margin-bottom: 6px; }
+    .portada { text-align: center; padding: 60px 0; }
+    .portada h1 { border: none; font-size: 2.2rem; }
+    .portada p { color: #6b7280; font-size: 1.1rem; }
+    .fecha { color: #9ca3af; font-size: 0.9rem; margin-top: 16px; }
+    .paso { background: #fdf2f8; border-left: 4px solid #db2777; padding: 12px 16px; margin: 12px 0; }
+    .nota { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; margin: 12px 0; }
+    .admin { background: #ecfdf5; border-left: 4px solid #10b981; padding: 12px 16px; margin: 12px 0; }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 0.9rem; }
+    th, td { border: 1px solid #e5e7eb; padding: 10px 12px; text-align: left; }
+    th { background: #fdf2f8; color: #9d174d; font-weight: 600; }
+    .toc { background: #f9fafb; padding: 24px; border-radius: 8px; margin: 24px 0; }
+    .toc ul { list-style: none; margin-left: 0; }
+    .toc li { margin: 8px 0; }
+    .toc a { color: #db2777; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .indice { page-break-before: always; }
+    @media print {
+      body { padding: 20px; }
+      h2 { page-break-after: avoid; }
+      .paso, .nota, .admin { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="portada">
+  <h1>Manual de Usuario</h1>
+  <p><strong>Florería Detalles Isabelita</strong></p>
+  <p>Isabel, Detalles Eternos 🌸</p>
+  <p class="fecha">Versión 1.0 · Producción · Febrero 2026</p>
+</div>
+
+<div class="indice">
+  <h2>Índice</h2>
+  <div class="toc">
+    <ol>
+      <li><a href="#intro">Introducción</a></li>
+      <li><a href="#requisitos">Requisitos</a></li>
+      <li><a href="#publico">Uso Público (Clientes)</a></li>
+      <li><a href="#admin">Panel de Administración</a></li>
+      <li><a href="#config">Configuración para Producción</a></li>
+    </ol>
+  </div>
+</div>
+
+<h2 id="intro">1. Introducción</h2>
+<p>Este manual describe el uso del sistema web de la <strong>Florería Detalles Isabelita</strong>, una aplicación para venta de arreglos florales en línea con catálogo, carrito, pedidos y panel de administración.</p>
+
+<h2 id="requisitos">2. Requisitos</h2>
+<ul>
+  <li>Navegador moderno (Chrome, Firefox, Edge, Safari)</li>
+  <li>Conexión a Internet</li>
+  <li>Para administrador: credenciales de acceso</li>
+</ul>
+
+<h2 id="publico">3. Uso Público (Clientes)</h2>
+
+<h3>3.1 Página de Inicio / Catálogo</h3>
+<p>La página principal muestra el catálogo de productos disponibles. El cliente puede:</p>
+<ul>
+  <li><strong>Buscar productos</strong> por nombre</li>
+  <li><strong>Filtrar por precio</strong> (mínimo y máximo)</li>
+  <li><strong>Agregar al carrito</strong> con el botón verde en cada producto</li>
+  <li>Ver el contador del carrito en la barra de navegación</li>
+</ul>
+
+<h3>3.2 Carrito de Compras</h3>
+<p>Acceso desde el menú "Carrito" o el ícono flotante en móviles.</p>
+<ul>
+  <li>Ver productos añadidos, precios y cantidades</li>
+  <li>Aumentar o reducir cantidad con los botones + y −</li>
+  <li>Eliminar productos</li>
+  <li>Los descuentos se aplican automáticamente según las reglas configuradas</li>
+</ul>
+
+<h3>3.3 Continuar con la Compra</h3>
+<div class="paso">
+  <strong>Paso 1.</strong> Hacer clic en <strong>Continuar con la compra</strong>.
+</div>
+<div class="paso">
+  <strong>Paso 2.</strong> Completar los datos del cliente:
+  <ul>
+    <li>Buscar cliente existente por nombre o cédula (opcional)</li>
+    <li>O ingresar cédula ecuatoriana para búsqueda automática</li>
+    <li>Si es cliente nuevo: completar nombre, teléfono, correo y dirección</li>
+  </ul>
+</div>
+<div class="paso">
+  <strong>Paso 3.</strong> Elegir método de pago:
+  <ul>
+    <li><strong>Efectivo</strong>: disponible solo para administrador en tienda</li>
+    <li><strong>Transferencia</strong>: subir comprobante de pago</li>
+    <li><strong>PayPal</strong>: pago en línea con tarjeta o cuenta PayPal</li>
+  </ul>
+</div>
+<div class="paso">
+  <strong>Paso 4.</strong> Hacer clic en <strong>Finalizar Pedido</strong>.
+</div>
+
+<h3>3.4 Página de Contacto</h3>
+<p>Formulario para enviar consultas: nombre, email, teléfono (opcional) y mensaje. Los mensajes se reciben en el panel de administración.</p>
+
+<h2 id="admin">4. Panel de Administración</h2>
+
+<h3>4.1 Iniciar Sesión</h3>
+<p>Acceder a <strong>/login.html</strong> y usar el correo y contraseña de administrador. Solo usuarios con rol "admin" pueden acceder al panel.</p>
+
+<h3>4.2 Administrar Clientes</h3>
+<p><strong>Ruta:</strong> Clientes</p>
+<ul>
+  <li>Ver lista de clientes con cédula, nombre, correo, teléfono y dirección</li>
+  <li>Buscar por cédula o nombre</li>
+  <li>Editar cliente (ícono de lápiz)</li>
+</ul>
+
+<h3>4.3 Administrar Productos</h3>
+<p><strong>Ruta:</strong> Productos</p>
+<ul>
+  <li><strong>Nuevo producto</strong>: nombre, descripción, precio, stock, categoría e imagen (JPG/PNG)</li>
+  <li><strong>Editar producto</strong>: modificar datos; la imagen es opcional al editar</li>
+  <li><strong>Eliminar producto</strong></li>
+  <li>Filtrar por nombre y rango de precio</li>
+</ul>
+
+<h3>4.4 Administrar Pedidos</h3>
+<p><strong>Ruta:</strong> Pedidos</p>
+<ul>
+  <li>Filtrar por fecha (desde/hasta) y estado</li>
+  <li>Estados: pendiente de pago, pendiente validación, pagado, cancelado</li>
+  <li><strong>Validar pago</strong>: para pedidos con transferencia y comprobante subido</li>
+  <li><strong>Ver comprobante</strong>: imagen del comprobante enviado por el cliente</li>
+  <li><strong>Pagar en efectivo</strong>: marcar como pagado (uso en tienda)</li>
+  <li><strong>Cancelar pedido</strong></li>
+</ul>
+
+<h3>4.5 Administrar Descuentos</h3>
+<p><strong>Ruta:</strong> Descuentos</p>
+<p>Configurar reglas de descuento automático:</p>
+<table>
+  <tr><th>Tipo</th><th>Descripción</th></tr>
+  <tr><td>Por Monto</td><td>Descuento según total del pedido (ej: 5% si compra ≥ $50)</td></tr>
+  <tr><td>Por Cantidad</td><td>Descuento según número de ítems (ej: 10% si lleva ≥ 10 productos)</td></tr>
+  <tr><td>Por Producto</td><td>Descuento específico por producto</td></tr>
+</table>
+<p>El sistema aplica automáticamente el <strong>mayor descuento</strong> que califique.</p>
+
+<h3>4.6 Administrar Mensajes</h3>
+<p><strong>Ruta:</strong> Mensajes</p>
+<ul>
+  <li>Ver mensajes del formulario de contacto</li>
+  <li><strong>Ver</strong> (ícono ojo): detalle del mensaje</li>
+  <li><strong>Responder</strong> (ícono flecha): envía un correo automático al contacto (requiere configuración EMAIL en servidor)</li>
+  <li><strong>Eliminar</strong> mensaje</li>
+</ul>
+
+<h3>4.7 Administrar Usuarios</h3>
+<p><strong>Ruta:</strong> Usuarios</p>
+<ul>
+  <li>Crear usuarios (nombre, email, contraseña, rol)</li>
+  <li>Editar usuario (rol, estado activo/inactivo)</li>
+  <li>Roles: <strong>admin</strong> (acceso total) y <strong>cliente</strong></li>
+</ul>
+
+<h2 id="config">5. Configuración para Producción</h2>
+
+<h3>5.1 Variables de Entorno (Railway, Render, etc.)</h3>
+<p>Configurar en el panel de la plataforma de hosting:</p>
+<table>
+  <tr><th>Variable</th><th>Uso</th></tr>
+  <tr><td>DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME</td><td>Conexión MySQL</td></tr>
+  <tr><td>JWT_SECRET</td><td>Clave para tokens de sesión</td></tr>
+  <tr><td>CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET</td><td>Imágenes de productos y comprobantes</td></tr>
+  <tr><td>PAYPAL_CLIENT_ID, PAYPAL_SECRET, PAYPAL_MODE</td><td>Pagos con PayPal</td></tr>
+  <tr><td>EMAIL_USER, EMAIL_PASS</td><td>Respuesta automática a mensajes de contacto (Gmail: usar Contraseña de aplicación)</td></tr>
+</table>
+
+<h3>5.2 Gmail para Respuestas Automáticas</h3>
+<ol>
+  <li>Activar verificación en dos pasos en la cuenta de Google</li>
+  <li>Crear una <strong>Contraseña de aplicación</strong> en myaccount.google.com/apppasswords</li>
+  <li>Configurar EMAIL_USER y EMAIL_PASS con ese correo y contraseña</li>
+</ol>
+
+<h3>5.3 Zona Horaria</h3>
+<p>El sistema está configurado para Ecuador (UTC-5). Las fechas de pedidos se guardan correctamente en hora local.</p>
+
+<hr style="margin: 40px 0; border: none; border-top: 1px solid #e5e7eb;">
+<p class="fecha" style="text-align: center;">Desarrollado por Ángel Fonseca · 2026</p>
+
+</body>
+</html>
