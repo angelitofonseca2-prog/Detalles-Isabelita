@@ -70,8 +70,9 @@ function renderMensajes(lista) {
                     <button class="btn-accion-editar btn-ver" data-nombre="${(m.nombre || "").replace(/"/g, '&quot;')}" data-mensaje="${(m.mensaje || "").replace(/"/g, '&quot;')}" title="Ver">
                         <i class="fas fa-eye"></i>
                     </button>
-                    <a href="mailto:${m.email}?subject=Respuesta - Detalles Isabelita&body=Hola ${encodeURIComponent(m.nombre || '')},%0D%0A%0D%0AGracias por contactarnos..." 
-                       class="btn-accion-editar p-2 text-green-600 hover:text-green-900" title="Responder"><i class="fas fa-reply"></i></a>
+                    <button class="btn-accion-editar btn-responder p-2 text-green-600 hover:text-green-900" data-id="${m.id}" data-nombre="${(m.nombre || "").replace(/"/g, '&quot;')}" title="Enviar respuesta automática">
+                        <i class="fas fa-reply"></i>
+                    </button>
                     <button class="btn-accion-eliminar btn-eliminar" data-id="${m.id}" title="Eliminar">
                         <i class="fas fa-trash-alt"></i>
                     </button>
@@ -119,14 +120,60 @@ function renderPaginacion(totalItems) {
 function configurarDelegacionEventos() {
     document.getElementById("listaMensajes")?.addEventListener("click", (e) => {
         const btnVer = e.target.closest(".btn-ver");
+        const btnResponder = e.target.closest(".btn-responder");
         const btnEliminar = e.target.closest(".btn-eliminar");
         if (btnVer) {
             verDetalle(btnVer.getAttribute("data-nombre") || "", btnVer.getAttribute("data-mensaje") || "");
+        }
+        if (btnResponder) {
+            enviarRespuestaAutomatica(btnResponder.getAttribute("data-id"), btnResponder.getAttribute("data-nombre"));
         }
         if (btnEliminar) {
             confirmarEliminar(btnEliminar.getAttribute("data-id"));
         }
     });
+}
+
+async function enviarRespuestaAutomatica(id, nombre) {
+    const result = await Swal.fire({
+        title: "¿Enviar respuesta automática?",
+        html: `Se enviará un correo a <strong>${nombre || "el contacto"}</strong> con un mensaje de agradecimiento.`,
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#16a34a",
+        cancelButtonColor: "#9ca3af",
+        confirmButtonText: "Sí, enviar",
+        cancelButtonText: "Cancelar"
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${API_MENSAJES}/${id}/responder`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({})
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (res.ok) {
+            Swal.fire("Enviado", "La respuesta se envió correctamente.", "success");
+        } else {
+            Swal.fire(
+                "Error",
+                data.error || "No se pudo enviar el correo.",
+                "error"
+            );
+        }
+    } catch (error) {
+        console.error("Error enviando respuesta:", error);
+        Swal.fire("Error", "Error de red al intentar enviar.", "error");
+    }
 }
 
 function verDetalle(nombre, mensaje) {

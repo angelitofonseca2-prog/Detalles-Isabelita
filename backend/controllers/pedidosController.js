@@ -423,8 +423,7 @@ export const pagarPedido = async (req, res) => {
 
     if (!id) return res.status(400).json({ error: "ID requerido" });
 
-    // multer/cloudinary normalmente deja la URL en req.file.path
-    const comprobanteUrl = req.file?.path || req.file?.secure_url || null;
+    const comprobanteUrl = req.file?.secure_url || req.file?.url || req.file?.path || null;
 
     if (!comprobanteUrl) {
       return res.status(400).json({ error: "Comprobante requerido" });

@@ -1,13 +1,13 @@
 // 📂 backend/middleware/uploadComprobanteCloud.js
 
 import multer from "multer";
-import { v2 as cloudinary } from "cloudinary";
+import cloudinary from "cloudinary";
 import createCloudinaryStorage from "multer-storage-cloudinary";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-// 🔧 Configuración de Cloudinary
+// 🔧 Configuración de Cloudinary (multer-storage-cloudinary usa cloudinary.v2.uploader)
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
@@ -27,18 +27,17 @@ const fileFilter = (req, file, cb) => {
 };
 
 
-// ☁️ Storage Cloudinary (el paquete exporta una función, no la clase)
+// ☁️ Storage Cloudinary - params como función para que public_id sea un string resuelto
 const storage = createCloudinaryStorage({
     cloudinary: cloudinary,
-    params: {
-        folder: "floreria_comprobantes", // carpeta en Cloudinary
-        allowed_formats: ["jpg", "jpeg", "png", "pdf"],
-        public_id: (req, file) => {
-            const timestamp = Date.now();
-            const original = file.originalname.split(".")[0];
-            return `comprobante_${original}_${timestamp}`;
-        },
-        resource_type: "auto", // permite PDF también
+    params: (req, file, cb) => {
+        const original = (file.originalname || "file").split(".")[0].replace(/\W/g, "_");
+        cb(null, {
+            folder: "floreria_comprobantes",
+            allowed_formats: ["jpg", "jpeg", "png", "pdf"],
+            resource_type: "auto",
+            public_id: `comprobante_${original}_${Date.now()}`,
+        });
     },
 });
 

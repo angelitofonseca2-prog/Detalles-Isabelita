@@ -153,7 +153,7 @@ export const crearProducto = async (req, res) => {
       return res.status(400).json({ error: "La imagen del producto es obligatoria" });
     }
 
-    const imagen = req.file.path; // URL Cloudinary
+    const imagen = req.file.secure_url || req.file.url || req.file.path;
 
     const [result] = await db.query(
       `
@@ -208,7 +208,7 @@ export const actualizarProducto = async (req, res) => {
     let imagen = existe[0].imagen;
 
     if (req.file) {
-      imagen = req.file.path; // nueva imagen Cloudinary
+      imagen = req.file.secure_url || req.file.url || req.file.path;
     }
 
     const [result] = await db.query(

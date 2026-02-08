@@ -1,11 +1,11 @@
-import { v2 as cloudinary } from "cloudinary";
+import cloudinary from "cloudinary";
 import createCloudinaryStorage from "multer-storage-cloudinary";
 import multer from "multer";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-// Configuración Cloudinary
+// Configuración Cloudinary (multer-storage-cloudinary usa cloudinary.v2.uploader)
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -24,17 +24,17 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Configuración del storage (el paquete exporta una función, no la clase)
+// Configuración del storage - params como función para que public_id sea un string resuelto
 const storage = createCloudinaryStorage({
   cloudinary,
-  params: {
-    folder: "floreria_productos",
-    allowed_formats: ["jpg", "jpeg", "png"],
-    public_id: (req, file) => {
-      const name = file.originalname.split(".")[0];
-      return `producto_${name}_${Date.now()}`;
-    },
-    resource_type: "image",
+  params: (req, file, cb) => {
+    const name = (file.originalname || "file").split(".")[0].replace(/\W/g, "_");
+    cb(null, {
+      folder: "floreria_productos",
+      allowed_formats: ["jpg", "jpeg", "png"],
+      resource_type: "image",
+      public_id: `producto_${name}_${Date.now()}`,
+    });
   },
 });
 
